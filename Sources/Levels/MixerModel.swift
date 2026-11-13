@@ -212,7 +212,7 @@ final class MixerModel: ObservableObject {
 
         outputDevice = device
         outputUID = CA.deviceUID(device) ?? ""
-        outputName = device == kAudioObjectUnknown ? "Нет устройства вывода" : CA.deviceName(device)
+        outputName = device == kAudioObjectUnknown ? NSLocalizedString("No output device", comment: "") : CA.deviceName(device)
         outputSymbol = Self.symbol(for: device, name: outputName)
 
         let block: AudioObjectPropertyListenerBlock = { [weak self] _, _ in self?.refreshMaster() }
@@ -325,7 +325,7 @@ final class MixerModel: ObservableObject {
                 try SMAppService.mainApp.unregister()
             }
         } catch {
-            errorMessage = "Автозапуск: \(error.localizedDescription)"
+            errorMessage = String(format: NSLocalizedString("Launch at login: %@", comment: ""), error.localizedDescription)
         }
         syncingLogin = true
         launchAtLogin = SMAppService.mainApp.status == .enabled

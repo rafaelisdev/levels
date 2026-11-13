@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
-	<string>ru</string>
+	<string>en</string>
 	<key>CFBundleDisplayName</key>
 	<string>Levels</string>
 	<key>CFBundleExecutable</key>
@@ -12,20 +12,32 @@
 	<string>AppIcon</string>
 	<key>CFBundleIdentifier</key>
 	<string>io.github.rafaelisdev.levels</string>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>en</string>
+		<string>zh-Hans</string>
+		<string>es</string>
+		<string>de</string>
+		<string>fr</string>
+		<string>ja</string>
+		<string>pt</string>
+		<string>ru</string>
+		<string>ko</string>
+	</array>
 	<key>CFBundleName</key>
 	<string>Levels</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.2</string>
+	<string>1.3</string>
 	<key>CFBundleVersion</key>
-	<string>3</string>
+	<string>4</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>11.0</string>
 	<key>LSUIElement</key>
 	<true/>
 	<key>NSAudioCaptureUsageDescription</key>
-	<string>Levels нужен доступ к звуку приложений, чтобы менять их громкость. Звук никуда не записывается и не отправляется.</string>
+	<string>Levels needs access to app audio to change each app’s volume. Audio is processed on your Mac and is never recorded or sent anywhere.</string>
 	<key>NSHighResolutionCapable</key>
 	<true/>
 </dict>

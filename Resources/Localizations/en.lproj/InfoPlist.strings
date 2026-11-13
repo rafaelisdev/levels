@@ -1,0 +1,1 @@
+"NSAudioCaptureUsageDescription" = "Levels needs access to app audio to change each app’s volume. Audio is processed on your Mac and is never recorded or sent anywhere.";

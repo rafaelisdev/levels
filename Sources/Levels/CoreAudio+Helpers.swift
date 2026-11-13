@@ -97,7 +97,7 @@ enum CA {
     }
 
     static func deviceName(_ device: AudioObjectID) -> String {
-        string(device, kAudioObjectPropertyName) ?? "Выход"
+        string(device, kAudioObjectPropertyName) ?? NSLocalizedString("Output", comment: "")
     }
 
     static func transportType(_ device: AudioObjectID) -> UInt32 {
@@ -165,7 +165,9 @@ func responsibility_get_pid_responsible_for_pid(_ pid: pid_t) -> pid_t
 struct CoreAudioError: LocalizedError {
     let step: String
     let status: OSStatus
-    var errorDescription: String? { "Не удалось \(step) (код \(status))" }
+    var errorDescription: String? {
+        String(format: NSLocalizedString("Couldn’t %@ (error %d)", comment: ""), NSLocalizedString(step, comment: ""), status)
+    }
 }
 
 @inline(__always)

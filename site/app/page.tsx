@@ -25,6 +25,7 @@ const jsonLd = {
       applicationCategory: "UtilitiesApplication",
       operatingSystem: "macOS 11 or later (per-app volume: macOS 14.2 or later)",
       softwareVersion: site.version,
+      inLanguage: ["en", "es", "de", "fr", "pt", "ru", "ja", "zh-Hans", "ko"],
       downloadUrl: site.zip,
       installUrl: site.github,
       fileSize: "0.8 MB",
@@ -61,7 +62,7 @@ export default function Home() {
       <main className="frame" id="top">
         <section className="section hero">
           <div>
-            <div className="pill"><span className="dot" /><b>v{site.version}</b> now on Homebrew</div>
+            <div className="pill"><span className="dot" /><b>v{site.version}</b> now in {site.languages.length} languages</div>
             <h1>A volume slider for every app.</h1>
             <p className="lead">
               Levels lives in your Mac’s menu bar and gives each app its own volume. Turn the call down,
@@ -73,7 +74,7 @@ export default function Home() {
               <a className="btn" href={site.zip}>Download .zip</a>
             </div>
             <div className="specs">
-              <span>Free</span><span>Under 1 MB</span><span>Apple Silicon &amp; Intel</span><span>macOS 11+</span>
+              <span>Free</span><span>0.8 MB download</span><span>Apple Silicon &amp; Intel</span><span>macOS 11+</span><span>{site.languages.length} languages</span>
             </div>
           </div>
           <div className="hero-art">
@@ -87,9 +88,9 @@ export default function Home() {
             <div>
               <p className="eyebrow">How it works</p>
               <h2>One click away, in the menu bar.</h2>
-              <p className="lead">Every app that plays sound shows up with its own fader. Try the panel — it works like the real one.</p>
+              <p className="lead">Every app that plays sound shows up with its own fader. This is the real panel, rebuilt for the web: drag the sliders, click an icon to mute.</p>
               <ul className="checks">
-                <li><span><b>Per-app sliders.</b> Lower a noisy browser tab without touching your music.</span></li>
+                <li><span><b>Per-app sliders.</b> Turn a noisy browser down without touching your music.</span></li>
                 <li><span><b>Click to mute.</b> Tap an app’s icon to silence it, tap again to bring it back.</span></li>
                 <li><span><b>Device volume too.</b> The output device and its level sit at the top.</span></li>
                 <li><span><b>Remembers.</b> Each app’s level comes back the next time it plays.</span></li>
@@ -105,7 +106,7 @@ export default function Home() {
             <article className="card wide">
               <div className="card-text">
                 <h3>Feels like hardware.</h3>
-                <p>A fader and a mute button for each app, with smooth gain ramps so nothing clicks or pops while you drag.</p>
+                <p>A fader and a mute button for each app. Gain changes are ramped smoothly while you drag.</p>
               </div>
               <div className="card-art">
                 <Image src={macro} alt="Close-up of a black fader cap" sizes="(max-width: 720px) 92vw, 420px" />
@@ -127,9 +128,9 @@ export default function Home() {
               <p>If Levels quits, every app returns to its normal volume instantly. Audio never leaves your Mac.</p>
             </article>
             <article className="card">
-              <span className="stat">&lt;1 MB</span>
+              <span className="stat">0.8 MB</span>
               <h3>Native and tiny</h3>
-              <p>A universal Swift binary for Apple Silicon and Intel. No Electron, no background services.</p>
+              <p>That’s the whole download: one universal Swift app for Apple Silicon and Intel. No Electron, no background services.</p>
             </article>
             <article className="card wide full">
               <div className="card-text">
@@ -156,8 +157,8 @@ export default function Home() {
             </li>
             <li className="step">
               <div>
-                <h3>Open it from the menu bar</h3>
-                <p>Levels has no Dock icon. Click the faders icon in the menu bar to open the panel; press Esc to close it.</p>
+                <h3>Open Levels</h3>
+                <p>Launch it from Spotlight or Applications (the curl script opens it for you). There’s no Dock icon: Levels lives in the menu bar. Click the faders icon to open the panel, press Esc to close it.</p>
               </div>
             </li>
             <li className="step">
@@ -172,7 +173,7 @@ export default function Home() {
             <div className="extra"><strong>Uninstall</strong><code>brew uninstall --zap levels</code></div>
             <div className="extra">
               <strong>Manual download</strong>
-              Get <a href={site.releases} className="mono" style={{ textDecoration: "underline" }}>Levels.zip</a> from GitHub Releases. The app isn’t notarized yet, so open it the first time with right-click → Open.
+              Get <a href={site.releases} className="mono" style={{ textDecoration: "underline" }}>Levels.zip</a> from GitHub Releases. The app isn’t notarized yet, so macOS blocks the first launch: open System Settings → Privacy &amp; Security and click “Open Anyway”.
             </div>
           </div>
         </section>

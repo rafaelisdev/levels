@@ -39,7 +39,7 @@ struct MixerPanel: View {
                         .padding(.top, 10)
                 }
 
-                SectionLabel("Приложения")
+                SectionLabel("Apps")
                     .padding(.horizontal, 16)
                     .padding(.top, 14)
                     .padding(.bottom, 4)
@@ -84,7 +84,7 @@ struct MixerPanel: View {
                 Text("Levels")
                     .font(.system(size: 15, weight: .semibold))
                     .tracking(-0.75)
-                Text(model.perAppSupported ? "Громкость каждого приложения" : "Громкость устройства")
+                Text(LocalizedStringKey(model.perAppSupported ? "Volume for every app" : "Device volume"))
                     .font(.system(size: 11))
                     .foregroundColor(.secondary)
             }
@@ -120,12 +120,12 @@ struct MixerPanel: View {
                             .contentShape(Circle())
                     }
                     .buttonStyle(PlainButtonStyle())
-                    .help(model.masterMuted ? "Включить звук" : "Выключить звук")
+                    .help(LocalizedStringKey(model.masterMuted ? "Unmute" : "Mute"))
 
                     VolumeSlider(value: v, muted: model.masterMuted) { model.setMasterVolume($0) }
                 }
             } else {
-                Text("У этого устройства громкость не регулируется")
+                Text("This device has no volume control")
                     .font(.system(size: 11))
                     .foregroundColor(.tertiaryText)
             }
@@ -163,7 +163,7 @@ struct MixerPanel: View {
     private var appRows: some View {
         VStack(alignment: .leading, spacing: 0) {
             if active.isEmpty {
-                Text("Сейчас ничего не играет")
+                Text("Nothing is playing right now")
                     .font(.system(size: 12))
                     .foregroundColor(.secondary)
                     .frame(maxWidth: .infinity)
@@ -179,8 +179,8 @@ struct MixerPanel: View {
                         Image(systemName: "chevron.right")
                             .font(.system(size: 9, weight: .bold))
                             .rotationEffect(.degrees(showOthers ? 90 : 0))
-                        Text("Другие приложения со звуком")
-                        Text("\(others.count)")
+                        Text("Other apps with sound")
+                        Text(verbatim: "\(others.count)")
                             .padding(.horizontal, 6)
                             .padding(.vertical, 1)
                             .background(Capsule().fill(Color.primary.opacity(0.08)))
@@ -216,19 +216,25 @@ struct MixerPanel: View {
     private var footer: some View {
         HStack(spacing: 10) {
             if model.launchAtLoginSupported {
-                Toggle("Запуск при входе", isOn: $model.launchAtLogin)
-                    .toggleStyle(SwitchToggleStyle())
-                    .controlSize(.mini)
-                    .font(.system(size: 11.5))
+                Toggle(isOn: $model.launchAtLogin) {
+                    Text("Launch at login")
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.75)   // long translations shrink instead of wrapping
+                }
+                .toggleStyle(SwitchToggleStyle())
+                .controlSize(.mini)
+                .font(.system(size: 11.5))
             }
             Spacer()
             if model.perAppSupported {
-                Button("Сбросить") { model.resetAll() }
+                Button("Reset") { model.resetAll() }
                     .buttonStyle(FooterButtonStyle())
-                    .help("Вернуть всем приложениям 100%")
+                    .fixedSize()
+                    .help("Set every app back to full volume")
             }
-            Button("Выйти") { NSApp.terminate(nil) }
+            Button("Quit") { NSApp.terminate(nil) }
                 .buttonStyle(FooterButtonStyle())
+                .fixedSize()
                 .keyboardShortcut("q")
         }
     }
@@ -270,7 +276,7 @@ struct AppRow: View {
                 .contentShape(Rectangle())
             }
             .buttonStyle(PlainButtonStyle())
-            .help(muted ? "Включить звук" : "Выключить звук")
+            .help(LocalizedStringKey(muted ? "Unmute" : "Mute"))
 
             VStack(alignment: .leading, spacing: 7) {
                 HStack(spacing: 6) {
@@ -297,8 +303,8 @@ struct AppRow: View {
         .onHover { hovering = $0 }
         .animation(.easeOut(duration: 0.15), value: muted)
         .contextMenu {
-            Button(muted ? "Включить звук" : "Выключить звук", action: onMute)
-            Button("Сбросить до 100%", action: onReset)
+            Button(LocalizedStringKey(muted ? "Unmute" : "Mute"), action: onMute)
+            Button("Reset to full volume", action: onReset)
         }
     }
 }
@@ -365,7 +371,7 @@ struct VolumeSlider: View {
 struct PercentText: View {
     let value: Float
     var body: some View {
-        Text("\(Int((value * 100).rounded()))%")
+        Text(verbatim: "\(Int((value * 100).rounded()))%")
             .font(Font.system(size: 11, weight: .medium).monospacedDigit())
             .foregroundColor(.secondary)
             .frame(minWidth: 34, alignment: .trailing)
@@ -384,7 +390,7 @@ struct PlayingIndicator: View {
         }
         .frame(height: 9, alignment: .bottom)
         .onAppear { up = true }
-        .help("Сейчас играет")
+        .help("Playing now")
     }
 
     private func bar(duration: Double, delay: Double) -> some View {
@@ -396,13 +402,14 @@ struct PlayingIndicator: View {
 }
 
 struct SectionLabel: View {
-    let text: String
-    init(_ text: String) { self.text = text }
+    let text: LocalizedStringKey
+    init(_ text: LocalizedStringKey) { self.text = text }
     var body: some View {
-        Text(text.uppercased())
+        Text(text)
             .font(.system(size: 10, weight: .semibold))
-            .tracking(0.6)
+            .tracking(0.6)          // Text.tracking (macOS 10.15); must come before textCase
             .foregroundColor(.tertiaryText)
+            .textCase(.uppercase)
     }
 }
 
@@ -412,10 +419,10 @@ struct EmptyState: View {
             Image(systemName: "speaker.zzz")
                 .font(.system(size: 22, weight: .light))
                 .foregroundColor(.tertiaryText)
-            Text("Нет приложений со звуком")
+            Text("No apps with sound")
                 .font(.system(size: 12, weight: .medium))
                 .foregroundColor(.secondary)
-            Text("Включите музыку или видео — приложение появится здесь")
+            Text("Play music or a video and the app will show up here")
                 .font(.system(size: 11))
                 .foregroundColor(.tertiaryText)
                 .multilineTextAlignment(.center)
@@ -434,9 +441,9 @@ struct LegacyNotice: View {
                 .font(.system(size: 15))
                 .foregroundColor(.accentColor)
             VStack(alignment: .leading, spacing: 4) {
-                Text("Громкость приложений — с macOS 14.2")
+                Text("Per-app volume needs macOS 14.2")
                     .font(.system(size: 12, weight: .semibold))
-                Text("На macOS \(version) система не даёт управлять звуком отдельных приложений. Общая громкость работает.")
+                Text("On macOS \(version), apps can’t control each other’s sound. Device volume still works.")
                     .font(.system(size: 11))
                     .foregroundColor(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -461,15 +468,15 @@ struct PermissionBanner: View {
                 .font(.system(size: 16))
                 .foregroundColor(.orange)
             VStack(alignment: .leading, spacing: 6) {
-                Text(status == .denied ? "Нет доступа к звуку приложений" : "Нужен доступ к звуку приложений")
+                Text(LocalizedStringKey(status == .denied ? "No access to app audio" : "Levels needs access to app audio"))
                     .font(.system(size: 12, weight: .semibold))
-                Text(status == .denied
-                     ? "Включите «Levels» в Настройках → Конфиденциальность → Запись экрана и системного аудио → Только системное аудио."
-                     : "macOS попросит разрешение «Только системное аудио». Звук никуда не записывается.")
+                Text(LocalizedStringKey(status == .denied
+                     ? "Turn on Levels in System Settings → Privacy & Security → Screen & System Audio Recording."
+                     : "macOS will ask for “System Audio Recording Only” access. Audio stays on your Mac and is never recorded."))
                     .font(.system(size: 11))
                     .foregroundColor(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
-                Button(status == .denied ? "Открыть Настройки" : "Разрешить", action: action)
+                Button(LocalizedStringKey(status == .denied ? "Open System Settings" : "Allow"), action: action)
                     .buttonStyle(ProminentButtonStyle(color: .orange))
             }
         }

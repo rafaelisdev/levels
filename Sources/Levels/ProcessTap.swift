@@ -68,12 +68,12 @@ final class ProcessTap {
         tapDescription = description
 
         var tap = AudioObjectID(kAudioObjectUnknown)
-        try check(AudioHardwareCreateProcessTap(description, &tap), "перехватить звук приложения")
+        try check(AudioHardwareCreateProcessTap(description, &tap), "capture the app’s audio")
         tapID = tap
 
         let format = CA.value(tap, kAudioTapPropertyFormat, initial: AudioStreamBasicDescription())
         if let format, format.mFormatID != kAudioFormatLinearPCM || format.mFormatFlags & kAudioFormatFlagIsFloat == 0 {
-            throw CoreAudioError(step: "разобрать формат звука", status: OSStatus(format.mFormatID))
+            throw CoreAudioError(step: "read the audio format", status: OSStatus(format.mFormatID))
         }
         let tapChannels = Int(format?.mChannelsPerFrame ?? 2)
 
@@ -91,7 +91,7 @@ final class ProcessTap {
             ]],
         ]
         var agg = AudioObjectID(kAudioObjectUnknown)
-        try check(AudioHardwareCreateAggregateDevice(aggregate as CFDictionary, &agg), "создать аудиоустройство")
+        try check(AudioHardwareCreateAggregateDevice(aggregate as CFDictionary, &agg), "create the audio device")
         aggregateID = agg
 
         let gainPointer = UnsafePointer(gainStorage)
@@ -107,10 +107,10 @@ final class ProcessTap {
                 meter[0] = max(meter[0], GainRenderer.peak(UnsafeMutableAudioBufferListPointer(UnsafeMutablePointer(mutating: input))))
                 meter[1] = max(meter[1], GainRenderer.peak(UnsafeMutableAudioBufferListPointer(output)))
             }
-        }, "запустить обработку звука")
+        }, "start audio processing")
         ioProcID = procID
 
-        try check(AudioDeviceStart(agg, procID), "запустить вывод")
+        try check(AudioDeviceStart(agg, procID), "start the output")
     }
 
     /// Swap the set of processes (e.g. Safari opened a new tab process) without

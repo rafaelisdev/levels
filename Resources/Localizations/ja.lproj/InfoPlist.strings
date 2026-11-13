@@ -1,0 +1,1 @@
+"NSAudioCaptureUsageDescription" = "Levelsはアプリごとの音量を変えるために、アプリのオーディオへのアクセスが必要です。音声はMac内で処理され、録音や送信は一切行いません。";

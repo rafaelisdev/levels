@@ -1,7 +1,8 @@
 export const site = {
   name: "Levels",
   url: "https://getlevels.vercel.app",
-  version: "1.2",
+  version: "1.3",
+  languages: ["English", "Español", "Deutsch", "Français", "Português", "Русский", "日本語", "简体中文", "한국어"],
   title: "Levels — a volume slider for every Mac app",
   description:
     "Levels is a tiny macOS menu bar app that gives every app its own volume slider and mute. No drivers, no kernel extensions. Install with Homebrew.",
@@ -28,6 +29,10 @@ export const faq = [
   {
     q: "What happens if Levels quits or crashes?",
     a: "Every app goes straight back to its normal volume. macOS only keeps an app routed through Levels while Levels is running.",
+  },
+  {
+    q: "Which languages does Levels speak?",
+    a: "Levels follows your Mac’s language: English, Español, Deutsch, Français, Português, Русский, 日本語, 简体中文 and 한국어.",
   },
   {
     q: "Is Levels free?",
