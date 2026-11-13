@@ -3,6 +3,8 @@
 Маленькое приложение для строки меню macOS: громкость каждого приложения отдельно,
 плюс общая громкость устройства вывода. Раньше называлось VolumeMixer («Микшер»).
 
+Сайт: **https://getlevels.vercel.app** (код в [site/](site/), Next.js на Vercel).
+
 ```bash
 brew install rafaelisdev/tap/levels
 ```
@@ -76,3 +78,16 @@ open /Applications/Levels.app --stdout /tmp/levels.log --args --debug
 - `--debug`: раз в секунду пишет уровни звука по каждому перехвату (вход и выход).
 - `--legacy`: ведёт себя как на macOS старше 14.2 (только общая громкость).
 - `--open`: открывает панель сразу при запуске.
+
+## Сайт
+
+`site/` — Next.js 16, статическая страница на Vercel (проект `getlevels`).
+
+```bash
+cd site && npm install && npm run dev      # http://localhost:3210
+npm run render                             # пересобрать 3D-рендеры в Blender (headless)
+vercel deploy --prod                       # публикация
+```
+
+Там же `public/llms.txt` и `public/llms-full.txt` для LLM, `robots`, `sitemap`,
+OpenGraph-картинка и JSON-LD (SoftwareApplication + FAQPage).

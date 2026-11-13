@@ -1,0 +1,39 @@
+# Levels — full description
+
+> Levels is a free macOS menu bar app for per-app volume control. Website: https://getlevels.vercel.app/ · Source: https://github.com/rafaelisdev/levels · Install: `brew install rafaelisdev/tap/levels`
+
+## What it does
+
+Levels adds an icon (three faders) to the macOS menu bar. Clicking it opens a small panel with:
+
+- the current output device (for example "MacBook Pro Speakers") and its volume slider with a mute button;
+- a list of apps that are currently playing sound, each with its own volume slider (0–100%) and a mute toggle (click the app's icon);
+- a collapsible list of other apps that have opened audio but are silent right now;
+- a "Launch at login" switch (macOS 13+), "Reset" (all apps back to 100%) and "Quit".
+
+Volumes are remembered per app (by bundle identifier) and re-applied automatically when that app plays again.
+
+## How it works
+
+- Levels uses Core Audio process taps (CATapDescription, AudioHardwareCreateProcessTap), available since macOS 14.2.
+- For an app set below 100%, Levels creates a private tap on that app's audio processes with "muted when tapped" behaviour, plus a private aggregate device made of the current output device and the tap.
+- A real-time IO callback copies the tapped audio to the output with the chosen gain (the slider is squared, so it feels even to the ear) and ramps gain changes to avoid clicks.
+- Helper processes (for example a browser's audio or web-content processes) are grouped under the app responsible for them.
+- If Levels stops reading the tap (it quits or crashes), macOS unmutes the app by itself, so a failure never leaves an app silent.
+- Once an app has been adjusted, its tap stays active even at 100% until the app quits, which avoids a volume jump at the 99%/100% boundary.
+
+## Requirements and permissions
+
+- Runs on macOS 11 Big Sur or later (Apple Silicon and Intel). Per-app control needs macOS 14.2+.
+- macOS asks once for "System Audio Recording Only" access, required by process taps. Audio is processed on the Mac in real time; Levels never records, stores or sends it anywhere.
+- No drivers, kernel extensions or system audio plug-ins are installed.
+
+## Distribution
+
+- Homebrew cask in the tap rafaelisdev/homebrew-tap: `brew install rafaelisdev/tap/levels`. The cask was renamed from `volumemixer`.
+- Install script: `curl -fsSL https://raw.githubusercontent.com/rafaelisdev/levels/main/install.sh | bash`.
+- The app is ad-hoc signed and not notarized. The cask and the script clear the quarantine flag; manual downloads need right-click → Open the first time.
+
+## Version
+
+1.2 (renamed from VolumeMixer, new brand icon and menu bar symbol).

@@ -1,0 +1,30 @@
+# Levels
+
+> Levels is a free, tiny macOS menu bar app that gives every app its own volume slider and mute button. It uses Apple's Core Audio process taps (macOS 14.2+), so it installs no drivers or kernel extensions. Install with `brew install rafaelisdev/tap/levels`.
+
+Key facts:
+
+- Platform: macOS 11 Big Sur and later, universal binary (Apple Silicon and Intel), under 1 MB.
+- Per-app volume and mute require macOS 14.2 or later; on older systems Levels controls the output device volume only.
+- Permission: macOS asks once for "System Audio Recording Only". Audio is processed locally in real time; nothing is recorded, stored or uploaded.
+- If Levels quits or crashes, every app immediately returns to its normal volume.
+- Levels remembers each app's volume and re-applies it whenever that app plays again.
+- Price: free. Source code: https://github.com/rafaelisdev/levels
+- Current version: 1.2. Formerly named VolumeMixer.
+
+## Install
+
+- Homebrew: `brew install rafaelisdev/tap/levels` (update with `brew upgrade levels`, remove with `brew uninstall --zap levels`)
+- Script: `curl -fsSL https://raw.githubusercontent.com/rafaelisdev/levels/main/install.sh | bash` (downloads the latest release, verifies its SHA-256, installs to /Applications)
+- Manual: download Levels.zip from https://github.com/rafaelisdev/levels/releases/latest; the app is not notarized, so open it the first time with right-click → Open.
+
+## Docs
+
+- [Website](https://getlevels.vercel.app/): overview, interactive panel preview, install steps, FAQ
+- [README](https://github.com/rafaelisdev/levels#readme): building from source, release process, debug flags
+- [Full description for LLMs](https://getlevels.vercel.app/llms-full.txt): how Levels works internally
+
+## Optional
+
+- [Releases](https://github.com/rafaelisdev/levels/releases): version history and downloads
+- [Homebrew tap](https://github.com/rafaelisdev/homebrew-tap): the cask definition
