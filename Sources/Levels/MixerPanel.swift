@@ -76,14 +76,14 @@ struct MixerPanel: View {
 
     private var header: some View {
         HStack(alignment: .center, spacing: 10) {
-            Image(nsImage: NSApp.applicationIconImage)
-                .resizable()
-                .interpolation(.high)
-                .frame(width: 32, height: 32)
+            LevelsMark(size: 26)
+                .foregroundColor(.primary)
 
             VStack(alignment: .leading, spacing: 1) {
-                Text("Микшер")
-                    .font(.system(size: 14, weight: .semibold))
+                // Wordmark: semibold, tight tracking (-0.05 em) as on the brand board.
+                Text("Levels")
+                    .font(.system(size: 15, weight: .semibold))
+                    .tracking(-0.75)
                 Text(model.perAppSupported ? "Громкость каждого приложения" : "Громкость устройства")
                     .font(.system(size: 11))
                     .foregroundColor(.secondary)
@@ -464,7 +464,7 @@ struct PermissionBanner: View {
                 Text(status == .denied ? "Нет доступа к звуку приложений" : "Нужен доступ к звуку приложений")
                     .font(.system(size: 12, weight: .semibold))
                 Text(status == .denied
-                     ? "Включите «Микшер» в Настройках → Конфиденциальность → Запись экрана и системного аудио → Только системное аудио."
+                     ? "Включите «Levels» в Настройках → Конфиденциальность → Запись экрана и системного аудио → Только системное аудио."
                      : "macOS попросит разрешение «Только системное аудио». Звук никуда не записывается.")
                     .font(.system(size: 11))
                     .foregroundColor(.secondary)

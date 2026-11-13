@@ -62,7 +62,7 @@ final class ProcessTap {
     private func start(label: String) throws {
         let description = CATapDescription(stereoMixdownOfProcesses: processObjects)
         description.uuid = UUID()
-        description.name = "VolumeMixer – \(label)"
+        description.name = "Levels – \(label)"
         description.muteBehavior = .mutedWhenTapped
         description.isPrivate = true
         tapDescription = description
@@ -78,8 +78,8 @@ final class ProcessTap {
         let tapChannels = Int(format?.mChannelsPerFrame ?? 2)
 
         let aggregate: [String: Any] = [
-            kAudioAggregateDeviceNameKey: "VolumeMixer – \(label)",
-            kAudioAggregateDeviceUIDKey: "VolumeMixer-" + UUID().uuidString,
+            kAudioAggregateDeviceNameKey: "Levels – \(label)",
+            kAudioAggregateDeviceUIDKey: "Levels-" + UUID().uuidString,
             kAudioAggregateDeviceMainSubDeviceKey: outputUID,
             kAudioAggregateDeviceIsPrivateKey: true,
             kAudioAggregateDeviceIsStackedKey: false,

@@ -5,27 +5,27 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>ru</string>
 	<key>CFBundleDisplayName</key>
-	<string>Микшер</string>
+	<string>Levels</string>
 	<key>CFBundleExecutable</key>
-	<string>VolumeMixer</string>
+	<string>Levels</string>
 	<key>CFBundleIconFile</key>
 	<string>AppIcon</string>
 	<key>CFBundleIdentifier</key>
-	<string>local.volumemixer</string>
+	<string>io.github.rafaelisdev.levels</string>
 	<key>CFBundleName</key>
-	<string>VolumeMixer</string>
+	<string>Levels</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.1</string>
+	<string>1.2</string>
 	<key>CFBundleVersion</key>
-	<string>2</string>
+	<string>3</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>11.0</string>
 	<key>LSUIElement</key>
 	<true/>
 	<key>NSAudioCaptureUsageDescription</key>
-	<string>Микшеру нужен доступ к звуку приложений, чтобы менять их громкость. Звук никуда не записывается и не отправляется.</string>
+	<string>Levels нужен доступ к звуку приложений, чтобы менять их громкость. Звук никуда не записывается и не отправляется.</string>
 	<key>NSHighResolutionCapable</key>
 	<true/>
 </dict>

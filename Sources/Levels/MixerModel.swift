@@ -71,6 +71,10 @@ final class MixerModel: ObservableObject {
 
         if let saved = UserDefaults.standard.dictionary(forKey: defaultsKey) as? [String: Double] {
             volumes = saved.mapValues { Float($0) }
+        } else if let old = UserDefaults(suiteName: "local.volumemixer")?.dictionary(forKey: defaultsKey) as? [String: Double] {
+            // First launch after the rename from VolumeMixer: keep the saved volumes.
+            volumes = old.mapValues { Float($0) }
+            UserDefaults.standard.set(old, forKey: defaultsKey)
         }
         if perAppSupported { permission = AudioCapturePermission.status() }
 

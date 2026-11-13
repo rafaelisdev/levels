@@ -1,9 +1,9 @@
 #!/bin/bash
-# Installs VolumeMixer (Микшер) from the latest GitHub release:
-#   curl -fsSL https://raw.githubusercontent.com/rafaelisdev/volumemixer/main/install.sh | bash
+# Installs Levels from the latest GitHub release:
+#   curl -fsSL https://raw.githubusercontent.com/rafaelisdev/levels/main/install.sh | bash
 set -euo pipefail
 
-REPO="${VOLUMEMIXER_REPO:-rafaelisdev/volumemixer}"
+REPO="${LEVELS_REPO:-rafaelisdev/levels}"
 URL="https://github.com/$REPO/releases/latest/download"
 DEST="/Applications"
 [ -w "$DEST" ] || { DEST="$HOME/Applications"; mkdir -p "$DEST"; }
@@ -11,21 +11,30 @@ DEST="/Applications"
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
 
-echo "Скачиваю Микшер…"
-curl -fsSL "$URL/VolumeMixer.zip" -o "$TMP/VolumeMixer.zip"
-curl -fsSL "$URL/VolumeMixer.zip.sha256" -o "$TMP/VolumeMixer.zip.sha256"
+echo "Скачиваю Levels…"
+curl -fsSL "$URL/Levels.zip" -o "$TMP/Levels.zip"
+curl -fsSL "$URL/Levels.zip.sha256" -o "$TMP/Levels.zip.sha256"
 
-expected="$(cut -d' ' -f1 "$TMP/VolumeMixer.zip.sha256")"
-actual="$(shasum -a 256 "$TMP/VolumeMixer.zip" | cut -d' ' -f1)"
+expected="$(cut -d' ' -f1 "$TMP/Levels.zip.sha256")"
+actual="$(shasum -a 256 "$TMP/Levels.zip" | cut -d' ' -f1)"
 if [ "$expected" != "$actual" ]; then
   echo "Архив повреждён: контрольная сумма не совпала." >&2
   exit 1
 fi
 
-pkill -x VolumeMixer 2>/dev/null || true
-rm -rf "$DEST/VolumeMixer.app"
-ditto -x -k "$TMP/VolumeMixer.zip" "$DEST"
+# The app used to be called VolumeMixer; remove the old copy so two don't run at once.
+for old in "/Applications/VolumeMixer.app" "$HOME/Applications/VolumeMixer.app"; do
+  if [ -d "$old" ]; then
+    pkill -x VolumeMixer 2>/dev/null || true
+    rm -rf "$old"
+    echo "Удалил старую версию: $old"
+  fi
+done
+
+pkill -x Levels 2>/dev/null || true
+rm -rf "$DEST/Levels.app"
+ditto -x -k "$TMP/Levels.zip" "$DEST"
 # Downloaded with curl, so there is normally no quarantine flag; clear it just in case.
-xattr -dr com.apple.quarantine "$DEST/VolumeMixer.app" 2>/dev/null || true
-open "$DEST/VolumeMixer.app"
-echo "Готово: Микшер в строке меню ($DEST/VolumeMixer.app)."
+xattr -dr com.apple.quarantine "$DEST/Levels.app" 2>/dev/null || true
+open "$DEST/Levels.app"
+echo "Готово: Levels в строке меню ($DEST/Levels.app)."

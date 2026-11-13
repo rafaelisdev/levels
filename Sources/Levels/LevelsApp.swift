@@ -37,9 +37,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
         if let button = statusItem.button {
-            let image = NSImage(systemSymbolName: "slider.vertical.3", accessibilityDescription: "Микшер")
-            image?.isTemplate = true
-            button.image = image
+            button.image = LevelsSymbol.menuBar
+            button.setAccessibilityLabel("Levels")
             button.target = self
             button.action = #selector(togglePanel)
             button.sendAction(on: [.leftMouseDown, .rightMouseDown])
@@ -52,10 +51,25 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { self.togglePanel() }
         }
         if let path = DebugFlags.snapshotPath {
-            Timer.scheduledTimer(withTimeInterval: 2, repeats: true) { [weak self] _ in
-                self?.panel.writeSnapshot(to: path)
+            Timer.scheduledTimer(withTimeInterval: 2, repeats: true) { _ in
+                Task { @MainActor in Self.writeSnapshot(of: model, to: path) }
             }
         }
+    }
+
+    /// Debug: render the panel with SwiftUI's own renderer (dark, solid background).
+    /// AppKit-backed controls such as the switch show as placeholders there.
+    @MainActor
+    private static func writeSnapshot(of model: MixerModel, to path: String) {
+        guard #available(macOS 13, *) else { return }
+        let view = MixerPanel(model: model)
+            .background(Color(white: 0.17))
+            .environment(\.colorScheme, .dark)
+        let renderer = ImageRenderer(content: view)
+        renderer.scale = 2
+        guard let cg = renderer.cgImage else { return }
+        let png = NSBitmapImageRep(cgImage: cg).representation(using: .png, properties: [:])
+        try? png?.write(to: URL(fileURLWithPath: path))
     }
 
     @objc private func togglePanel() {
@@ -101,20 +115,9 @@ final class MenuPanel: NSPanel {
             .background(SizeReader { [weak self] size in self?.fit(size) })
         hosting = NSHostingView(rootView: AnyView(root))
         hosting.autoresizingMask = [.width, .height]
-        if DebugFlags.snapshotPath != nil {
-            // cacheDisplay can't capture vibrancy, so snapshots use a solid dark backing.
-            appearance = NSAppearance(named: .darkAqua)
-            let plain = NSView()
-            plain.wantsLayer = true
-            plain.layer?.backgroundColor = NSColor(white: 0.17, alpha: 1).cgColor
-            hosting.frame = plain.bounds
-            plain.addSubview(hosting)
-            contentView = plain
-        } else {
-            hosting.frame = effect.bounds
-            effect.addSubview(hosting)
-            contentView = effect
-        }
+        hosting.frame = effect.bounds
+        effect.addSubview(hosting)
+        contentView = effect
     }
 
     override var canBecomeKey: Bool { true }
@@ -193,24 +196,6 @@ final class MenuPanel: NSPanel {
         return image
     }
 
-    /// Debug: draw the panel content over a plain background into a PNG.
-    func writeSnapshot(to path: String) {
-        let view = hosting!
-        let rect = view.bounds
-        guard rect.width > 0, let rep = view.bitmapImageRepForCachingDisplay(in: rect) else { return }
-        view.cacheDisplay(in: rect, to: rep)
-        let image = NSImage(size: rect.size)
-        image.lockFocus()
-        let dark = NSApp.effectiveAppearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
-        NSColor(white: dark ? 0.17 : 0.95, alpha: 1).setFill()
-        NSBezierPath(roundedRect: NSRect(origin: .zero, size: rect.size), xRadius: radius, yRadius: radius).fill()
-        rep.draw(in: rect)
-        image.unlockFocus()
-        if let tiff = image.tiffRepresentation, let bmp = NSBitmapImageRep(data: tiff),
-           let png = bmp.representation(using: .png, properties: [:]) {
-            try? png.write(to: URL(fileURLWithPath: path))
-        }
-    }
 }
 
 private struct SizeKey: PreferenceKey {
