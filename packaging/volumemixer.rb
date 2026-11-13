@@ -11,13 +11,13 @@ cask "volumemixer" do
   desc "Per-app volume control in the menu bar"
   homepage "https://github.com/__OWNER__/volumemixer"
 
-  depends_on macos: ">= :big_sur"
+  depends_on macos: :big_sur
 
   app "VolumeMixer.app"
 
   # The app is not notarized; without this macOS refuses to open it on first launch.
-  postflight do
-    system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{appdir}/VolumeMixer.app"]
+  postflight_steps do
+    run "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "{{appdir}}/VolumeMixer.app"]
   end
 
   uninstall quit: "local.volumemixer"
