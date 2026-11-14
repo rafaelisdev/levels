@@ -38,6 +38,9 @@
 "Delay" = "Délai";
 "slowest" = "le plus lent";
 "waits %lld ms" = "attend %lld ms";
+"macOS hid the Levels icon" = "macOS a masqué l’icône de Levels";
+"The menu bar is full, so the icon sits behind the camera notch. Hold ⌘ and drag icons to make room, or open Levels again from Spotlight to bring up this panel." = "La barre des menus est pleine : l’icône se trouve derrière l’encoche de la caméra. Maintenez ⌘ et faites glisser des icônes pour faire de la place, ou rouvrez Levels depuis Spotlight pour afficher ce panneau.";
+"Got it" = "Compris";
 "capture the app’s audio" = "capter le son de l’app";
 "read the audio format" = "lire le format audio";
 "create the audio device" = "créer le périphérique audio";

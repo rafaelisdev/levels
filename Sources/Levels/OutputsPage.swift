@@ -46,6 +46,12 @@ struct OutputsPage: View {
                 .padding(.horizontal, 16)
                 .padding(.bottom, 10)
 
+            if model.isSyncing && model.permission != .authorized {
+                PermissionBanner(status: model.permission) { model.requestPermission() }
+                    .padding(.horizontal, 12)
+                    .padding(.bottom, 10)
+            }
+
             SectionLabel("Play on")
                 .padding(.horizontal, 16)
                 .padding(.bottom, 4)
@@ -137,6 +143,12 @@ private struct OffsetRow: View {
     private let range = MixerModel.offsetRange
     private var shown: Double { dragValue ?? offset }
 
+    private func step(by seconds: Double) {
+        pendingApply?.cancel()
+        dragValue = nil
+        set(offset + seconds)
+    }
+
     private func drag(to value: Double) {
         let ms = (value * 1000).rounded() / 1000
         dragValue = ms
@@ -160,12 +172,12 @@ private struct OffsetRow: View {
                     .font(.system(size: 12.5, weight: .medium))
                     .lineLimit(1)
                 Spacer(minLength: 4)
-                StepButton(symbol: "minus") { set(shown - 0.001) }
+                StepButton(symbol: "minus") { step(by: -0.001) }
                 Text(verbatim: String(format: "%+.0f ms", shown * 1000))
                     .font(Font.system(size: 11, weight: .medium).monospacedDigit())
                     .foregroundColor(.secondary)
                     .frame(minWidth: 54, alignment: .center)
-                StepButton(symbol: "plus") { set(shown + 0.001) }
+                StepButton(symbol: "plus") { step(by: 0.001) }
             }
             VolumeSlider(value: Float((shown - range.lowerBound) / (range.upperBound - range.lowerBound))) { v in
                 drag(to: range.lowerBound + Double(v) * (range.upperBound - range.lowerBound))

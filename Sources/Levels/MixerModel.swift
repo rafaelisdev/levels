@@ -50,6 +50,8 @@ final class MixerModel: ObservableObject {
     @Published private(set) var syncSummary: SyncSummary?
     /// True while taps are being rebuilt in the background (e.g. an output was added).
     @Published private(set) var engineBusy = false
+    /// macOS hid the menu bar icon (no room); the panel explains it until dismissed.
+    @Published var menuBarIconHidden = false
     @Published var launchAtLogin = false {
         didSet { if launchAtLogin != oldValue && !syncingLogin { applyLaunchAtLogin() } }
     }
@@ -64,6 +66,10 @@ final class MixerModel: ObservableObject {
     private var outputDevice = AudioObjectID(kAudioObjectUnknown)
     private var outputUID = ""
     private var requestingPermission = false
+    /// TCC turned a request down this session. After that it can still report "never
+    /// asked" (it does for a rebuilt, re-signed app), and asking again only gets another
+    /// instant no, so the panel flipped between its two permission cards every second.
+    private var permissionRefused = false
     private var syncingLogin = false
     private var deviceListeners: [(AudioObjectPropertyAddress, AudioObjectPropertyListenerBlock)] = []
     private var timer: Timer?
@@ -303,9 +309,11 @@ final class MixerModel: ObservableObject {
     /// Asks TCC off the main thread (a round trip that can take a while), then updates.
     private func refreshPermission() {
         DispatchQueue.global(qos: .utility).async {
-            let status = AudioCapturePermission.status()
+            let reported = AudioCapturePermission.status()
             DispatchQueue.main.async { [weak self] in
-                guard let self, status != self.permission else { return }
+                guard let self else { return }
+                let status = reported == .unknown && self.permissionRefused ? .denied : reported
+                guard status != self.permission else { return }
                 self.permission = status
                 self.reconcile()
             }
@@ -389,7 +397,7 @@ final class MixerModel: ObservableObject {
     /// queue and reports back through `apply(_:)`.
     private func pushSettings() {
         guard #available(macOS 14.2, *), perAppSupported else { return }
-        if permission == .unknown && apps.contains(where: { wantsTap($0.id) }) { askForPermission() }
+        askForPermissionIfNeeded()
         var settings = TapEngine.Settings()
         settings.authorized = permission == .authorized
         settings.outputUID = outputUID
@@ -405,12 +413,18 @@ final class MixerModel: ObservableObject {
     private func apply(_ report: TapEngine.Report) {
         if report.apps != apps {
             apps = report.apps
-            // A newly seen app may need a tap the moment it shows up (saved volume, or
-            // the permission prompt).
-            if permission == .unknown && apps.contains(where: { wantsTap($0.id) }) { askForPermission() }
+            // A newly seen app may need a tap the moment it shows up (saved volume).
+            askForPermissionIfNeeded()
         }
         if report.error != errorMessage { errorMessage = report.error }
         if report.sync != syncSummary { syncSummary = report.sync }
+    }
+
+    /// Asks the first time Levels needs a tap: a slider below 100%, a mute, or playing
+    /// on several outputs (without the permission that only plays on the default one).
+    private func askForPermissionIfNeeded() {
+        guard permission == .unknown else { return }
+        if (syncReady && isSyncing) || apps.contains(where: { wantsTap($0.id) }) { askForPermission() }
     }
 
     private func askForPermission() {
@@ -419,6 +433,7 @@ final class MixerModel: ObservableObject {
         AudioCapturePermission.request { [weak self] granted in
             guard let self else { return }
             self.requestingPermission = false
+            if !granted { self.permissionRefused = true }
             let status = AudioCapturePermission.status()
             self.permission = granted ? .authorized : (status == .unknown ? .denied : status)
             self.reconcile()

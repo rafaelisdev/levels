@@ -12,10 +12,13 @@ VERSION=$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" Resource
 ./build.sh release
 SHA=$(cut -d' ' -f1 build/Levels.zip.sha256)
 
-git push origin HEAD
+# Releases ship from main (install.sh is served from there): fast-forward it to HEAD.
+git push origin HEAD:main
+NOTES="Install: \`brew install $OWNER/tap/levels\` or \`curl -fsSL https://raw.githubusercontent.com/$OWNER/levels/main/install.sh | bash\`"
+# Optional release notes above the install line: RELEASE_NOTES=path/to/notes.md
+[ -n "${RELEASE_NOTES:-}" ] && NOTES="$(cat "$RELEASE_NOTES")"$'\n\n'"$NOTES"
 gh release create "v$VERSION" build/Levels.zip build/Levels.zip.sha256 \
-  --repo "$OWNER/levels" --title "Микшер $VERSION" \
-  --notes "Установка: \`brew install $OWNER/tap/levels\` или \`curl -fsSL https://raw.githubusercontent.com/$OWNER/levels/main/install.sh | bash\`"
+  --repo "$OWNER/levels" --target "$(git rev-parse HEAD)" --title "Levels $VERSION" --notes "$NOTES"
 
 TAP="$(mktemp -d)"
 trap 'rm -rf "$TAP"' EXIT

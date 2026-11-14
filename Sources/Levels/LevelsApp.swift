@@ -57,14 +57,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         let model = MixerModel.shared
 
-        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
-        if let button = statusItem.button {
-            button.image = LevelsSymbol.menuBar
-            button.setAccessibilityLabel("Levels")
-            button.target = self
-            button.action = #selector(togglePanel)
-            button.sendAction(on: [.leftMouseDown, .rightMouseDown])
-        }
+        makeStatusItem()
 
         panel = MenuPanel(rootView: MixerPanel(model: model, close: { [weak self] in self?.panel.dismiss() }))
         panel.willShow = { model.panelOpened() }
@@ -72,6 +65,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if DebugFlags.openAtLaunch {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { self.togglePanel() }
         }
+        watchForHiddenStatusItem(model: model)
         if let app = DebugFlags.syncApp, #available(macOS 14.2, *) {
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                 SyncProbe.start(appID: app, outputUIDs: DebugFlags.syncOutputs)
@@ -102,6 +96,79 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         try? png?.write(to: URL(fileURLWithPath: path))
     }
 
+    /// Opening Levels again (Spotlight, Finder, Dock) shows the panel: the way in when
+    /// the menu bar icon is hidden. Shown a beat later, once the activation is done.
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        NSApp.activate(ignoringOtherApps: true)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { self.showPanel() }
+        return false
+    }
+
+    /// macOS hides status items that don't fit (on MacBooks, behind the camera notch).
+    /// If ours stays hidden even next to the system icons, open the panel once and say
+    /// why, so Levels never just vanishes. Checked for a few seconds: the first launch
+    /// after an update can take that long to draw the icon.
+    private func watchForHiddenStatusItem(model: MixerModel, checksLeft: Int = 4) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
+            guard let self else { return }
+            let visible = self.statusItemVisible
+            self.debugLog("status item visible: \(visible)")
+            guard !visible else { return }
+            if checksLeft > 1 {
+                self.watchForHiddenStatusItem(model: model, checksLeft: checksLeft - 1)
+            } else {
+                model.menuBarIconHidden = true
+                self.showPanel()
+            }
+        }
+    }
+
+    private static let statusItemName = "LevelsStatusItem"
+    /// Where AppKit keeps a status item's place; larger is further left.
+    private static var positionKey: String { "NSStatusItem Preferred Position \(statusItemName)" }
+
+    private func makeStatusItem() {
+        placeStatusItemOnFirstLaunch()
+        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
+        statusItem.autosaveName = Self.statusItemName   // keeps a ⌘-dragged position across launches
+        guard let button = statusItem.button else { return }
+        button.image = LevelsSymbol.menuBar
+        button.setAccessibilityLabel("Levels")
+        button.target = self
+        button.action = #selector(togglePanel)
+        button.sendAction(on: [.leftMouseDown, .rightMouseDown])
+    }
+
+    /// A new status item starts at the far left, closest to the notch, where a full menu
+    /// bar hides it. So the first time, Levels takes a place just left of the system
+    /// (Control Center) icons, next to Sound. Only Levels' own position is written, and
+    /// only before the item exists (AppKit reads it once, when the item is created); after
+    /// that, wherever the user ⌘-drags the icon is kept.
+    private func placeStatusItemOnFirstLaunch() {
+        guard UserDefaults.standard.object(forKey: Self.positionKey) == nil else { return }
+        let system = UserDefaults(suiteName: "com.apple.controlcenter")?.dictionaryRepresentation()
+            .filter { $0.key.hasPrefix("NSStatusItem Preferred Position") }
+            .compactMap { ($0.value as? NSNumber)?.doubleValue } ?? []
+        let position = (system.max() ?? 360) + 40
+        UserDefaults.standard.set(position, forKey: Self.positionKey)
+        debugLog("status item placed at preferred position \(Int(position))")
+    }
+
+    private func debugLog(_ text: String) {
+        guard DebugFlags.debug else { return }
+        print(text)
+        fflush(stdout)
+    }
+
+    private var statusItemVisible: Bool {
+        statusItem.button?.window?.occlusionState.contains(.visible) ?? false
+    }
+
+    private func showPanel() {
+        guard let button = statusItem.button, !panel.isVisible else { return }
+        panel.toggle(below: button)
+    }
+
     @objc private func togglePanel() {
         guard let button = statusItem.button else { return }
         panel.toggle(below: button)
@@ -116,6 +183,7 @@ final class MenuPanel: NSPanel {
     private weak var anchor: NSStatusBarButton?
     private var keyMonitor: Any?
     private var lastDismiss = Date.distantPast
+    private var shownAt = Date.distantPast
     private let radius: CGFloat = 13
     var willShow: (() -> Void)?
 
@@ -155,6 +223,12 @@ final class MenuPanel: NSPanel {
 
     override func resignKey() {
         super.resignKey()
+        // Activation shuffles focus right after the panel opens (e.g. when Levels is
+        // reopened from Spotlight); that is not the user clicking away.
+        if Date().timeIntervalSince(shownAt) < 0.6 {
+            DispatchQueue.main.async { self.makeKey() }
+            return
+        }
         dismiss()
     }
 
@@ -174,6 +248,7 @@ final class MenuPanel: NSPanel {
         let size = hosting.fittingSize
         setFrame(frameFor(size: size), display: true)
         alphaValue = 0
+        shownAt = Date()
         makeKeyAndOrderFront(nil)
         NSAnimationContext.runAnimationGroup { ctx in
             ctx.duration = 0.12

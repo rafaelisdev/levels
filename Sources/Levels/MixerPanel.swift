@@ -43,6 +43,12 @@ struct MixerPanel: View {
                 .padding(.top, 14)
                 .padding(.bottom, 12)
 
+            if model.menuBarIconHidden {
+                HiddenIconNotice { model.menuBarIconHidden = false }
+                    .padding(.horizontal, 12)
+                    .padding(.bottom, 10)
+            }
+
             masterCard
                 .padding(.horizontal, 12)
 
@@ -487,6 +493,32 @@ struct LegacyNotice: View {
             RoundedRectangle(cornerRadius: 10, style: .continuous)
                 .fill(Color.accentColor.opacity(0.10))
         )
+    }
+}
+
+/// Shown when macOS hid the menu bar icon because the menu bar is full.
+struct HiddenIconNotice: View {
+    let dismiss: () -> Void
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: "menubar.rectangle")
+                .font(.system(size: 15))
+                .foregroundColor(.accentColor)
+            VStack(alignment: .leading, spacing: 6) {
+                Text("macOS hid the Levels icon")
+                    .font(.system(size: 12, weight: .semibold))
+                Text("The menu bar is full, so the icon sits behind the camera notch. Hold ⌘ and drag icons to make room, or open Levels again from Spotlight to bring up this panel.")
+                    .font(.system(size: 11))
+                    .foregroundColor(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                Button("Got it", action: dismiss)
+                    .buttonStyle(ProminentButtonStyle(color: .accentColor))
+            }
+        }
+        .padding(10)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(RoundedRectangle(cornerRadius: 10, style: .continuous).fill(Color.accentColor.opacity(0.10)))
     }
 }
 

@@ -11,8 +11,9 @@ final class SyncGroup: AppTap {
         var extraLatency: Double = 0
     }
 
-    /// Room for about 2.7 s at 48 kHz: the slowest supported output plus headroom.
-    private static let bufferFrames = 1 << 17
+    /// History kept for the slowest output: up to ~1 s of device, TV and calibration
+    /// latency, with plenty of headroom.
+    private static let bufferSeconds = 2.5
     /// Allowance for scheduling jitter between capture and the slowest output.
     private static let margin = 0.005
 
@@ -34,7 +35,8 @@ final class SyncGroup: AppTap {
     init(processObjects: [AudioObjectID], label: String, outputs: [Output], gain: Float) throws {
         precondition(!outputs.isEmpty, "a sync group needs at least one output")
         self.outputs = outputs
-        buffer = TimedRingBuffer(capacityFrames: Self.bufferFrames)
+        let rate = CA.deviceID(forUID: outputs[0].uid).map(CA.nominalSampleRate) ?? 48_000
+        buffer = TimedRingBuffer(capacityFrames: Int(rate * Self.bufferSeconds))
         do {
             capture = try CaptureTap(processObjects: processObjects, clockDeviceUID: outputs[0].uid,
                                      gain: gain, label: label, buffer: buffer)
