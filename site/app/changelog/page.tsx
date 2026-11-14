@@ -14,12 +14,13 @@ export const metadata: Metadata = {
 
 const all: { version: string; date: string; label: string; notes: string[] }[] = [
   {
-    // Shown once site.version is "1.4". Fill in the date and label on release day.
-    version: "1.4", date: "", label: "",
+    version: "1.4", date: "2026-11-14", label: "November 14, 2026",
     notes: [
-      "Play on several outputs at once. Click the device name in the panel, tick the outputs, and every app plays on all of them, lined up so they sound together.",
-      "A Sync section shows each output’s delay and how long Levels holds it back. Every device except the built-in one has a slider to fine-tune it by ear, and the setting is saved per device.",
-      "The panel stays responsive while outputs change, with a “Lining up…” indicator while Levels rebuilds them.",
+      "Play on several outputs at once, for example the Mac’s speakers, a TV and headphones. Click the device name in the panel, tick the outputs, and every app plays on all of them, lined up so they sound together. Needs macOS 14.2 or later.",
+      "A Sync section shows each output’s delay and how long it waits for the slowest one. Every device except the built-in one has an offset slider with 1 ms steps, saved per device.",
+      "Adding or removing outputs no longer freezes the panel. The audio work runs in the background, with a “Lining up…” indicator while it happens.",
+      "The menu bar icon now sits next to the system icons, so a full menu bar no longer hides it behind the notch. If it is hidden anyway, the panel opens and explains why.",
+      "Fixed: the permission card no longer flickers.",
       "The new screens are translated into all 8 languages.",
     ],
   },

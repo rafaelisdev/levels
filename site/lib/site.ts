@@ -1,10 +1,10 @@
 export const site = {
   name: "Levels",
   url: "https://getlevels.app",
-  // Release checklist for 1.4: set version to "1.4" (the hero badge and the changelog entry
-  // follow it), add the 1.4 date in app/changelog/page.tsx, and update "Current version" in
-  // public/llms.txt and the version list in public/llms-full.txt.
-  version: "1.3",
+  // On a release: set the version here (the hero badge and the changelog entry follow it),
+  // add the date in app/changelog/page.tsx, and update "Current version" in public/llms.txt
+  // and the version list in public/llms-full.txt.
+  version: "1.4",
   languages: ["English", "Español", "Deutsch", "Français", "Português", "Русский", "日本語", "简体中文", "한국어"],
   title: "Levels: per-app volume control for Mac",
   description:

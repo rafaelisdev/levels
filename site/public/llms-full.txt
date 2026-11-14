@@ -69,6 +69,7 @@ Guide: https://getlevels.app/guides/sync-audio-outputs-mac
 
 ## Versions
 
+- 1.4: play on several outputs at once in sync, per-device offsets, no panel freezes when outputs change, menu bar icon placed next to the system icons.
 - 1.3: interface in English plus 8 languages.
 - 1.2: renamed from VolumeMixer, new icon and menu bar symbol.
 - 1.1: first public release.

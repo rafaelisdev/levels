@@ -12,7 +12,7 @@ Key facts:
 - Levels remembers each app's volume and applies it again whenever that app plays.
 - Several outputs in sync (Levels 1.4 and later, macOS 14.2+): every app can play on several output devices at once, for example the built-in speakers, a TV over HDMI and headphones. Levels holds the faster outputs back to match the slowest, so they sound together without an echo. Each device except the built-in one has an offset slider (-200 to +500 ms, 1 ms steps) for tuning by ear. AirPlay is not included. Because all sound waits for the slowest output (around 170 ms with a TV), video on the Mac's screen runs ahead of the sound.
 - Price: free. License: MIT. Source code: https://github.com/rafaelisdev/levels
-- Current version: 1.3. Formerly named VolumeMixer.
+- Current version: 1.4. Formerly named VolumeMixer.
 - Not supported: per-app EQ or effects, sending one app to a different output than the others.
 
 ## Install
