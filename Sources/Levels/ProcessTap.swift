@@ -9,14 +9,12 @@ import Foundation
 /// output, multiplied by `gain`. If anything stops, the tap stops being read and
 /// macOS unmutes the app by itself, so a failure never leaves an app silent.
 @available(macOS 14.2, *)
-final class ProcessTap {
-    let outputUID: String
-    private(set) var processObjects: [AudioObjectID]
+final class ProcessTap: AppTap {
+    var outputUID: String { session.clockDeviceUID }
+    var destination: String { outputUID }
+    var processObjects: [AudioObjectID] { session.processObjects }
 
-    private var tapID = AudioObjectID(kAudioObjectUnknown)
-    private var aggregateID = AudioObjectID(kAudioObjectUnknown)
-    private var ioProcID: AudioDeviceIOProcID?
-    private var tapDescription: CATapDescription?
+    private var session: TapSession!
     private let gainStorage: UnsafeMutablePointer<Float>
     /// Debug only (--debug): peak of tapped input and of our output since last read.
     private let meter: UnsafeMutablePointer<Float>?
@@ -29,26 +27,31 @@ final class ProcessTap {
     }
 
     init(processObjects: [AudioObjectID], outputUID: String, gain: Float, label: String) throws {
-        self.processObjects = processObjects
-        self.outputUID = outputUID
         gainStorage = .allocate(capacity: 1)
         gainStorage.initialize(to: min(max(gain, 0), 1))
-        if DebugFlags.debug {
-            meter = .allocate(capacity: 2)
-            meter!.initialize(repeating: 0, count: 2)
-        } else {
-            meter = nil
-        }
-        do {
-            try start(label: label)
-        } catch {
-            invalidate()
-            throw error
+        meter = DebugFlags.debug ? .allocate(capacity: 2) : nil
+        meter?.initialize(repeating: 0, count: 2)
+
+        // Every stored property is set by now, so if TapSession throws, deinit runs and
+        // frees the storage: nothing to clean up here.
+        let gainPointer = UnsafePointer(gainStorage)
+        let meter = self.meter
+        session = try TapSession(processObjects: processObjects, clockDeviceUID: outputUID, label: label) { format in
+            var current = gainPointer.pointee
+            return { _, input, _, output, _ in
+                let target = gainPointer.pointee
+                GainRenderer.render(input: input, output: output, tapChannels: format.channels, from: current, to: target)
+                current = target
+                if let meter {
+                    meter[0] = max(meter[0], GainRenderer.peak(UnsafeMutableAudioBufferListPointer(UnsafeMutablePointer(mutating: input))))
+                    meter[1] = max(meter[1], GainRenderer.peak(UnsafeMutableAudioBufferListPointer(output)))
+                }
+            }
         }
     }
 
     deinit {
-        invalidate()
+        session?.invalidate()
         gainStorage.deallocate()
         meter?.deallocate()
     }
@@ -59,88 +62,14 @@ final class ProcessTap {
         return (meter[0], meter[1])
     }
 
-    private func start(label: String) throws {
-        let description = CATapDescription(stereoMixdownOfProcesses: processObjects)
-        description.uuid = UUID()
-        description.name = "Levels – \(label)"
-        description.muteBehavior = .mutedWhenTapped
-        description.isPrivate = true
-        tapDescription = description
-
-        var tap = AudioObjectID(kAudioObjectUnknown)
-        try check(AudioHardwareCreateProcessTap(description, &tap), "capture the app’s audio")
-        tapID = tap
-
-        let format = CA.value(tap, kAudioTapPropertyFormat, initial: AudioStreamBasicDescription())
-        if let format, format.mFormatID != kAudioFormatLinearPCM || format.mFormatFlags & kAudioFormatFlagIsFloat == 0 {
-            throw CoreAudioError(step: "read the audio format", status: OSStatus(format.mFormatID))
-        }
-        let tapChannels = Int(format?.mChannelsPerFrame ?? 2)
-
-        let aggregate: [String: Any] = [
-            kAudioAggregateDeviceNameKey: "Levels – \(label)",
-            kAudioAggregateDeviceUIDKey: "Levels-" + UUID().uuidString,
-            kAudioAggregateDeviceMainSubDeviceKey: outputUID,
-            kAudioAggregateDeviceIsPrivateKey: true,
-            kAudioAggregateDeviceIsStackedKey: false,
-            kAudioAggregateDeviceTapAutoStartKey: true,
-            kAudioAggregateDeviceSubDeviceListKey: [[kAudioSubDeviceUIDKey: outputUID]],
-            kAudioAggregateDeviceTapListKey: [[
-                kAudioSubTapUIDKey: description.uuid.uuidString,
-                kAudioSubTapDriftCompensationKey: true,
-            ]],
-        ]
-        var agg = AudioObjectID(kAudioObjectUnknown)
-        try check(AudioHardwareCreateAggregateDevice(aggregate as CFDictionary, &agg), "create the audio device")
-        aggregateID = agg
-
-        let gainPointer = UnsafePointer(gainStorage)
-        let meter = self.meter
-        var current = gainStorage.pointee
-        var procID: AudioDeviceIOProcID?
-        // nil queue: the block runs directly on the real-time IO thread.
-        try check(AudioDeviceCreateIOProcIDWithBlock(&procID, agg, nil) { _, input, _, output, _ in
-            let target = gainPointer.pointee
-            GainRenderer.render(input: input, output: output, tapChannels: tapChannels, from: current, to: target)
-            current = target
-            if let meter {
-                meter[0] = max(meter[0], GainRenderer.peak(UnsafeMutableAudioBufferListPointer(UnsafeMutablePointer(mutating: input))))
-                meter[1] = max(meter[1], GainRenderer.peak(UnsafeMutableAudioBufferListPointer(output)))
-            }
-        }, "start audio processing")
-        ioProcID = procID
-
-        try check(AudioDeviceStart(agg, procID), "start the output")
-    }
-
-    /// Swap the set of processes (e.g. Safari opened a new tab process) without
-    /// tearing the tap down. Returns false if Core Audio refused; the caller then rebuilds.
+    /// Swap the set of processes without tearing the tap down. Returns false if Core
+    /// Audio refused; the caller then rebuilds.
     func updateProcesses(_ objects: [AudioObjectID]) -> Bool {
-        guard let description = tapDescription, tapID != kAudioObjectUnknown else { return false }
-        description.processes = objects
-        var addr = CA.address(kAudioTapPropertyDescription)
-        var ref: CATapDescription = description
-        let status = withUnsafeMutablePointer(to: &ref) {
-            AudioObjectSetPropertyData(tapID, &addr, 0, nil, UInt32(MemoryLayout<CATapDescription>.size), $0)
-        }
-        if status == noErr { processObjects = objects }
-        return status == noErr
+        session.updateProcesses(objects)
     }
 
     func invalidate() {
-        if aggregateID != kAudioObjectUnknown {
-            if let ioProcID {
-                AudioDeviceStop(aggregateID, ioProcID)
-                AudioDeviceDestroyIOProcID(aggregateID, ioProcID)
-            }
-            AudioHardwareDestroyAggregateDevice(aggregateID)
-        }
-        if tapID != kAudioObjectUnknown {
-            AudioHardwareDestroyProcessTap(tapID)
-        }
-        ioProcID = nil
-        aggregateID = AudioObjectID(kAudioObjectUnknown)
-        tapID = AudioObjectID(kAudioObjectUnknown)
+        session.invalidate()
     }
 }
 
@@ -153,22 +82,16 @@ enum GainRenderer {
         let ins = UnsafeMutableAudioBufferListPointer(UnsafeMutablePointer(mutating: input))
         let outs = UnsafeMutableAudioBufferListPointer(output)
 
-        // The aggregate's input list holds the output device's own inputs (if it has any,
-        // e.g. a USB interface) first and the tap last, so skip to the tap's channels.
-        var totalIn = 0
-        for b in ins { totalIn += Int(b.mNumberChannels) }
-        let tapCount = min(tapChannels, totalIn)
-        let offset = totalIn - tapCount
+        let (offset, tapCount) = BufferChannels.tapRange(ins, tapChannels: tapChannels)
 
         var frames = Int.max
         if tapCount > 0 {
             for c in 0..<tapCount {
-                if let ch = channel(ins, offset + c) { frames = min(frames, ch.frames) }
+                if let ch = BufferChannels.channel(ins, offset + c) { frames = min(frames, ch.frames) }
             }
         }
 
-        var totalOut = 0
-        for b in outs { totalOut += Int(b.mNumberChannels) }
+        let totalOut = BufferChannels.count(outs)
 
         var outBase = 0
         for ob in outs {
@@ -187,7 +110,7 @@ enum GainRenderer {
                 let global = outBase + c
                 if totalOut == 1 && tapCount >= 2 {
                     // Mono output: fold L+R.
-                    guard let l = channel(ins, offset), let r = channel(ins, offset + 1) else { continue }
+                    guard let l = BufferChannels.channel(ins, offset), let r = BufferChannels.channel(ins, offset + 1) else { continue }
                     var g = g0
                     for f in 0..<n {
                         dst[f * oc + c] = 0.5 * (l.data[f * l.stride] + r.data[f * r.stride]) * g
@@ -199,7 +122,7 @@ enum GainRenderer {
                 if global < tapCount { source = global }
                 else if tapCount == 1 && global < 2 { source = 0 }
                 else { continue } // extra surround channels stay silent
-                guard let s = channel(ins, offset + source) else { continue }
+                guard let s = BufferChannels.channel(ins, offset + source) else { continue }
                 var g = g0
                 for f in 0..<n {
                     dst[f * oc + c] = s.data[f * s.stride] * g
@@ -217,25 +140,5 @@ enum GainRenderer {
             for i in 0..<(Int(b.mDataByteSize) / MemoryLayout<Float>.size) { p = max(p, abs(samples[i])) }
         }
         return p
-    }
-
-    private struct Channel {
-        let data: UnsafePointer<Float>
-        let stride: Int
-        let frames: Int
-    }
-
-    @inline(__always)
-    private static func channel(_ list: UnsafeMutableAudioBufferListPointer, _ index: Int) -> Channel? {
-        var base = 0
-        for b in list {
-            let n = Int(b.mNumberChannels)
-            if index < base + n, n > 0, let d = b.mData {
-                let p = UnsafePointer(d.assumingMemoryBound(to: Float.self)) + (index - base)
-                return Channel(data: p, stride: n, frames: Int(b.mDataByteSize) / (MemoryLayout<Float>.size * n))
-            }
-            base += n
-        }
-        return nil
     }
 }

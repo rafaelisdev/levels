@@ -27,6 +27,17 @@
 "Launch at login: %@" = "로그인 시 실행: %@";
 "Output" = "출력";
 "Couldn’t %@ (error %d)" = "%@ 실패(오류 %d)";
+"Outputs" = "출력";
+"Lining up…" = "맞추는 중…";
+"Play on several outputs at once. Levels lines them up so they sound together." = "여러 출력에서 동시에 재생합니다. Levels가 타이밍을 맞춰 함께 들리게 합니다.";
+"Play on" = "재생 위치";
+"Sync" = "동기화";
+"Play something with a clear beat and move a device until the echo is gone." = "박자가 뚜렷한 소리를 재생하고 메아리가 사라질 때까지 기기를 조정하세요.";
+"Default" = "기본";
+"The default output always plays" = "기본 출력은 항상 재생됩니다";
+"Delay" = "지연";
+"slowest" = "가장 느림";
+"waits %lld ms" = "%lld ms 대기";
 "capture the app’s audio" = "앱 오디오 캡처";
 "read the audio format" = "오디오 형식 읽기";
 "create the audio device" = "오디오 기기 생성";

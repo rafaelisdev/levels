@@ -10,10 +10,20 @@ enum DebugFlags {
     /// `--open`: show the panel right after launch.
     static let openAtLaunch = args.contains("--open") || snapshotPath != nil
     /// `--snapshot <path>`: keep writing the panel to a PNG (for checking the UI).
-    static let snapshotPath: String? = {
-        guard let i = args.firstIndex(of: "--snapshot"), i + 1 < args.count else { return nil }
+    static let snapshotPath: String? = value(after: "--snapshot")
+    /// `--sync <bundle id> [--sync-outputs uid,uid]`: multi-output sync test (SyncProbe).
+    static let syncApp: String? = value(after: "--sync")
+    static let syncOutputs: [String]? = value(after: "--sync-outputs")?.split(separator: ",").map(String.init)
+    /// `--sync-measure [--measure-dump <path>]`: acoustic sync measurement (SyncMeasure),
+    /// from the Levels Measure copy. `--sync-analyze <path>`: analyse a saved recording.
+    static let measure = args.contains("--sync-measure")
+    static let measureDump: String? = value(after: "--measure-dump")
+    static let analyzePath: String? = value(after: "--sync-analyze")
+
+    private static func value(after flag: String) -> String? {
+        guard let i = args.firstIndex(of: flag), i + 1 < args.count else { return nil }
         return args[i + 1]
-    }()
+    }
 }
 
 // An AppKit shell instead of SwiftUI's MenuBarExtra, which needs macOS 13.
@@ -33,6 +43,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var panel: MenuPanel!
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        if let path = DebugFlags.analyzePath, #available(macOS 14.2, *) {
+            SyncMeasure.analyze(path: path)
+            return
+        }
+        if DebugFlags.measure, #available(macOS 14.2, *) {
+            // Measurement copy: no panel and no taps, just the test, then quit. Started a
+            // moment after launch: creating IO procs during launch can stall Core Audio.
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                SyncMeasure.run(outputUIDs: DebugFlags.syncOutputs, dumpPath: DebugFlags.measureDump)
+            }
+            return
+        }
         let model = MixerModel.shared
 
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
@@ -50,6 +72,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if DebugFlags.openAtLaunch {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { self.togglePanel() }
         }
+        if let app = DebugFlags.syncApp, #available(macOS 14.2, *) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                SyncProbe.start(appID: app, outputUIDs: DebugFlags.syncOutputs)
+            }
+        }
         if let path = DebugFlags.snapshotPath {
             Timer.scheduledTimer(withTimeInterval: 2, repeats: true) { _ in
                 Task { @MainActor in Self.writeSnapshot(of: model, to: path) }
@@ -62,7 +89,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     @MainActor
     private static func writeSnapshot(of model: MixerModel, to path: String) {
         guard #available(macOS 13, *) else { return }
-        let view = MixerPanel(model: model)
+        let page: AnyView = CommandLine.arguments.contains("--snapshot-outputs")
+            ? AnyView(OutputsPage(model: model) {}.frame(width: 330))
+            : AnyView(MixerPanel(model: model))
+        let view = page
             .background(Color(white: 0.17))
             .environment(\.colorScheme, .dark)
         let renderer = ImageRenderer(content: view)

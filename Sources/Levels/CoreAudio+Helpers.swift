@@ -1,6 +1,7 @@
 import AudioToolbox
 import CoreAudio
 import Foundation
+import LevelsCore
 
 /// Thin wrappers around the C Core Audio property API.
 enum CA {
@@ -137,6 +138,57 @@ enum CA {
 
     static func setMuted(_ device: AudioObjectID, _ muted: Bool) {
         set(device, kAudioDevicePropertyMute, scope: kAudioDevicePropertyScopeOutput, UInt32(muted ? 1 : 0))
+    }
+
+    // MARK: Outputs (multi-output sync)
+
+    struct OutputDevice: Equatable {
+        let id: AudioObjectID
+        let uid: String
+        let name: String
+        let transport: UInt32
+    }
+
+    static func deviceID(forUID uid: String) -> AudioObjectID? {
+        var addr = address(kAudioHardwarePropertyTranslateUIDToDevice)
+        var qualifier = uid as CFString
+        var id = AudioObjectID(kAudioObjectUnknown)
+        var size = UInt32(MemoryLayout<AudioObjectID>.size)
+        let status = withUnsafeMutablePointer(to: &qualifier) {
+            AudioObjectGetPropertyData(system, &addr, UInt32(MemoryLayout<CFString>.size), $0, &size, &id)
+        }
+        return status == noErr && id != kAudioObjectUnknown ? id : nil
+    }
+
+    /// Real devices that can play sound. Virtual devices (other apps' drivers) and
+    /// aggregates are left out: syncing to them makes no sense.
+    static func outputDevices() -> [OutputDevice] {
+        array(system, kAudioHardwarePropertyDevices, initial: AudioObjectID(0)).compactMap { id in
+            let transport = transportType(id)
+            guard transport != kAudioDeviceTransportTypeVirtual, transport != kAudioDeviceTransportTypeAggregate,
+                  !array(id, kAudioDevicePropertyStreams, scope: kAudioDevicePropertyScopeOutput, initial: AudioObjectID(0)).isEmpty,
+                  let uid = deviceUID(id) else { return nil }
+            return OutputDevice(id: id, uid: uid, name: deviceName(id), transport: transport)
+        }
+    }
+
+    static func nominalSampleRate(_ device: AudioObjectID) -> Double {
+        value(device, kAudioDevicePropertyNominalSampleRate, initial: Float64(48_000)) ?? 48_000
+    }
+
+    /// What Core Audio knows about an output's latency (see `OutputTiming`).
+    static func outputTiming(_ device: AudioObjectID, extraLatency: Double = 0) -> OutputTiming {
+        let out = kAudioDevicePropertyScopeOutput
+        let rate = nominalSampleRate(device)
+        let buffer = value(device, kAudioDevicePropertyBufferFrameSize, initial: UInt32(512)) ?? 512
+        let safety = value(device, kAudioDevicePropertySafetyOffset, scope: out, initial: UInt32(0)) ?? 0
+        let latency = value(device, kAudioDevicePropertyLatency, scope: out, initial: UInt32(0)) ?? 0
+        let stream = array(device, kAudioDevicePropertyStreams, scope: out, initial: AudioObjectID(0)).first
+        let streamLatency = stream.flatMap { value($0, kAudioStreamPropertyLatency, initial: UInt32(0)) } ?? 0
+        return OutputTiming(ioLatency: Double(buffer + safety) / rate,
+                            bufferDuration: Double(buffer) / rate,
+                            deviceLatency: Double(latency + streamLatency) / rate,
+                            extraLatency: extraLatency)
     }
 
     // MARK: Processes (macOS 14.2+)

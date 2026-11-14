@@ -56,6 +56,33 @@ STRINGS = {
     "Launch at login: %@": ["Запуск при входе: %@", "Beim Anmelden starten: %@", "Ouverture à la connexion : %@", "Abrir al iniciar sesión: %@", "ログイン時に起動: %@", "登录时启动：%@", "로그인 시 실행: %@", "Abrir ao iniciar sessão: %@"],
     "Output": ["Выход", "Ausgang", "Sortie", "Salida", "出力", "输出", "출력", "Saída"],
     "Couldn’t %@ (error %d)": ["Не удалось %@ (ошибка %d)", "%@ fehlgeschlagen (Fehler %d)", "Impossible de %@ (erreur %d)", "No se pudo %@ (error %d)", "%@できませんでした（エラー %d）", "无法%@（错误 %d）", "%@ 실패(오류 %d)", "Não foi possível %@ (erro %d)"],
+    "Outputs": ["Выходы", "Ausgänge", "Sorties", "Salidas", "出力", "输出", "출력", "Saídas"],
+    "Lining up…": ["Выравниваю…", "Wird abgeglichen…", "Alignement…", "Alineando…", "調整中…", "正在对齐…", "맞추는 중…", "Alinhando…"],
+    "Play on several outputs at once. Levels lines them up so they sound together.": [
+        "Играйте сразу на нескольких выходах. Levels выравнивает их, чтобы они звучали вместе.",
+        "Spiele auf mehreren Ausgängen gleichzeitig. Levels gleicht sie ab, damit sie zusammen klingen.",
+        "Lisez sur plusieurs sorties à la fois. Levels les aligne pour qu’elles sonnent ensemble.",
+        "Reproduce en varias salidas a la vez. Levels las alinea para que suenen juntas.",
+        "複数の出力で同時に再生します。Levelsがタイミングをそろえて、同時に鳴るようにします。",
+        "同时在多个输出上播放。Levels 会对齐它们，让声音同步。",
+        "여러 출력에서 동시에 재생합니다. Levels가 타이밍을 맞춰 함께 들리게 합니다.",
+        "Toque em várias saídas ao mesmo tempo. O Levels as alinha para soarem juntas."],
+    "Play on": ["Играть на", "Wiedergabe auf", "Lire sur", "Reproducir en", "再生先", "播放到", "재생 위치", "Tocar em"],
+    "Sync": ["Синхронизация", "Abgleich", "Synchronisation", "Sincronización", "同期", "同步", "동기화", "Sincronia"],
+    "Play something with a clear beat and move a device until the echo is gone.": [
+        "Включите что-нибудь с чётким ритмом и двигайте устройство, пока эхо не пропадёт.",
+        "Spiel etwas mit klarem Beat ab und verschiebe ein Gerät, bis das Echo weg ist.",
+        "Lancez un morceau au rythme marqué et déplacez un appareil jusqu’à ce que l’écho disparaisse.",
+        "Reproduce algo con un ritmo claro y mueve un dispositivo hasta que desaparezca el eco.",
+        "リズムがはっきりした音を再生し、エコーが消えるまでデバイスを調整してください。",
+        "播放节奏清晰的内容，调整设备直到回声消失。",
+        "박자가 뚜렷한 소리를 재생하고 메아리가 사라질 때까지 기기를 조정하세요.",
+        "Toque algo com batida marcada e ajuste um dispositivo até o eco sumir."],
+    "Default": ["Основной", "Standard", "Par défaut", "Predeterminado", "デフォルト", "默认", "기본", "Padrão"],
+    "The default output always plays": ["Основной выход играет всегда", "Der Standardausgang spielt immer", "La sortie par défaut joue toujours", "La salida predeterminada siempre suena", "デフォルトの出力は常に再生されます", "默认输出始终播放", "기본 출력은 항상 재생됩니다", "A saída padrão sempre toca"],
+    "Delay": ["Задержка", "Verzögerung", "Délai", "Retardo", "遅延", "延迟", "지연", "Atraso"],
+    "slowest": ["самый медленный", "am langsamsten", "le plus lent", "el más lento", "最も遅い", "最慢", "가장 느림", "o mais lento"],
+    "waits %lld ms": ["ждёт %lld мс", "wartet %lld ms", "attend %lld ms", "espera %lld ms", "%lld ms待機", "等待 %lld 毫秒", "%lld ms 대기", "espera %lld ms"],
     "capture the app’s audio": ["перехватить звук приложения", "Aufnahme des App-Tons", "capter le son de l’app", "capturar el audio de la app", "アプリのオーディオを取得", "捕获应用音频", "앱 오디오 캡처", "capturar o áudio do app"],
     "read the audio format": ["прочитать формат звука", "Lesen des Audioformats", "lire le format audio", "leer el formato de audio", "オーディオ形式を読み取り", "读取音频格式", "오디오 형식 읽기", "ler o formato de áudio"],
     "create the audio device": ["создать аудиоустройство", "Erstellen des Audiogeräts", "créer le périphérique audio", "crear el dispositivo de audio", "オーディオデバイスを作成", "创建音频设备", "오디오 기기 생성", "criar o dispositivo de áudio"],
@@ -94,7 +121,7 @@ def write(lang: str, pairs: list[tuple[str, str]], usage: str) -> None:
 for key, values in STRINGS.items():
     assert len(values) == len(LANGS), key
     for v in values:  # every format specifier in the key must survive translation
-        for spec in ("%@", "%d"):
+        for spec in ("%@", "%d", "%lld"):
             assert key.count(spec) == v.count(spec), (key, v)
 
 write("en", [], AUDIO_USAGE_EN)  # English = keys; the folder marks it as a supported language

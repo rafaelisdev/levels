@@ -27,6 +27,17 @@
 "Launch at login: %@" = "ログイン時に起動: %@";
 "Output" = "出力";
 "Couldn’t %@ (error %d)" = "%@できませんでした（エラー %d）";
+"Outputs" = "出力";
+"Lining up…" = "調整中…";
+"Play on several outputs at once. Levels lines them up so they sound together." = "複数の出力で同時に再生します。Levelsがタイミングをそろえて、同時に鳴るようにします。";
+"Play on" = "再生先";
+"Sync" = "同期";
+"Play something with a clear beat and move a device until the echo is gone." = "リズムがはっきりした音を再生し、エコーが消えるまでデバイスを調整してください。";
+"Default" = "デフォルト";
+"The default output always plays" = "デフォルトの出力は常に再生されます";
+"Delay" = "遅延";
+"slowest" = "最も遅い";
+"waits %lld ms" = "%lld ms待機";
 "capture the app’s audio" = "アプリのオーディオを取得";
 "read the audio format" = "オーディオ形式を読み取り";
 "create the audio device" = "オーディオデバイスを作成";

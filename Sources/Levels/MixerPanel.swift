@@ -11,6 +11,7 @@ struct MixerPanel: View {
     @ObservedObject var model: MixerModel
     var close: () -> Void = {}
     @State private var showOthers = false
+    @State private var showingOutputs = false
 
     private var active: [AudioApp] {
         model.apps.filter { $0.isPlaying || model.volume(of: $0.id) < 1 || model.isMuted($0.id) }
@@ -23,6 +24,19 @@ struct MixerPanel: View {
     }
 
     var body: some View {
+        Group {
+            if showingOutputs {
+                OutputsPage(model: model) { withAnimation(.easeInOut(duration: 0.2)) { showingOutputs = false } }
+                    .transition(.move(edge: .trailing).combined(with: .opacity))
+            } else {
+                mainPage
+                    .transition(.move(edge: .leading).combined(with: .opacity))
+            }
+        }
+        .frame(width: 330)
+    }
+
+    private var mainPage: some View {
         VStack(alignment: .leading, spacing: 0) {
             header
                 .padding(.horizontal, 16)
@@ -69,7 +83,6 @@ struct MixerPanel: View {
                 .padding(.horizontal, 16)
                 .padding(.vertical, 10)
         }
-        .frame(width: 330)
     }
 
     // MARK: Header
@@ -97,14 +110,33 @@ struct MixerPanel: View {
     private var masterCard: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 6) {
-                Image(systemName: model.outputSymbol)
-                    .font(.system(size: 11, weight: .medium))
+                // Tapping the device opens the Outputs page (per-app volume systems only).
+                Button {
+                    withAnimation(.easeInOut(duration: 0.2)) { showingOutputs = true }
+                } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: model.outputSymbol)
+                            .font(.system(size: 11, weight: .medium))
+                            .frame(width: 14)
+                        Text(model.outputName)
+                            .font(.system(size: 11.5, weight: .medium))
+                            .lineLimit(1)
+                        if model.isSyncing {
+                            Text(verbatim: "+\(model.activeOutputs.count - 1)")
+                                .font(.system(size: 10, weight: .semibold))
+                                .padding(.horizontal, 5)
+                                .background(Capsule().fill(Color.primary.opacity(0.1)))
+                        }
+                        if model.perAppSupported {
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 8, weight: .bold))
+                        }
+                    }
                     .foregroundColor(.secondary)
-                    .frame(width: 14)
-                Text(model.outputName)
-                    .font(.system(size: 11.5, weight: .medium))
-                    .foregroundColor(.secondary)
-                    .lineLimit(1)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(PlainButtonStyle())
+                .disabled(!model.perAppSupported)
                 Spacer()
                 if let v = model.masterVolume {
                     PercentText(value: model.masterMuted ? 0 : v)

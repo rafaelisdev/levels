@@ -27,6 +27,17 @@
 "Launch at login: %@" = "Ouverture à la connexion : %@";
 "Output" = "Sortie";
 "Couldn’t %@ (error %d)" = "Impossible de %@ (erreur %d)";
+"Outputs" = "Sorties";
+"Lining up…" = "Alignement…";
+"Play on several outputs at once. Levels lines them up so they sound together." = "Lisez sur plusieurs sorties à la fois. Levels les aligne pour qu’elles sonnent ensemble.";
+"Play on" = "Lire sur";
+"Sync" = "Synchronisation";
+"Play something with a clear beat and move a device until the echo is gone." = "Lancez un morceau au rythme marqué et déplacez un appareil jusqu’à ce que l’écho disparaisse.";
+"Default" = "Par défaut";
+"The default output always plays" = "La sortie par défaut joue toujours";
+"Delay" = "Délai";
+"slowest" = "le plus lent";
+"waits %lld ms" = "attend %lld ms";
 "capture the app’s audio" = "capter le son de l’app";
 "read the audio format" = "lire le format audio";
 "create the audio device" = "créer le périphérique audio";

@@ -27,6 +27,17 @@
 "Launch at login: %@" = "Запуск при входе: %@";
 "Output" = "Выход";
 "Couldn’t %@ (error %d)" = "Не удалось %@ (ошибка %d)";
+"Outputs" = "Выходы";
+"Lining up…" = "Выравниваю…";
+"Play on several outputs at once. Levels lines them up so they sound together." = "Играйте сразу на нескольких выходах. Levels выравнивает их, чтобы они звучали вместе.";
+"Play on" = "Играть на";
+"Sync" = "Синхронизация";
+"Play something with a clear beat and move a device until the echo is gone." = "Включите что-нибудь с чётким ритмом и двигайте устройство, пока эхо не пропадёт.";
+"Default" = "Основной";
+"The default output always plays" = "Основной выход играет всегда";
+"Delay" = "Задержка";
+"slowest" = "самый медленный";
+"waits %lld ms" = "ждёт %lld мс";
 "capture the app’s audio" = "перехватить звук приложения";
 "read the audio format" = "прочитать формат звука";
 "create the audio device" = "создать аудиоустройство";
