@@ -211,8 +211,12 @@ h3 { font-size: 19px; letter-spacing: -0.02em; line-height: 1.25; }
 @media (max-width: 720px) { .cmd-row code { font-size: 12.5px; } .cmd-row .prompt { display: none; } }
 
 /* Panel demo: a copy of the real app panel (macOS light appearance, system font). */
-.lv-stage {
+.lv-stage, .lv-mini {
   --acc: #007aff; --t1: rgba(0,0,0,.85); --t2: rgba(0,0,0,.5); --t3: rgba(0,0,0,.26);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", var(--font-sans), sans-serif;
+  -webkit-font-smoothing: antialiased; color: var(--t1);
+}
+.lv-stage {
   position: relative; display: flex; justify-content: center; padding: 56px 24px 40px; overflow: hidden;
   border: 1px solid var(--line); border-radius: var(--r);
   background:
@@ -293,6 +297,73 @@ h3 { font-size: 19px; letter-spacing: -0.02em; line-height: 1.25; }
 .lv-range:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px; border-radius: 4px; }
 .lv-stage button:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px; }
 @media (max-width: 720px) { .lv-stage { padding: 48px 12px 28px; } }
+
+/* Outputs page (OutputsPage.swift): opens from the device name, slides in from the right. */
+.lv-panel { position: relative; overflow: hidden; }
+.lv-leaving { position: absolute; inset: 0 0 auto 0; pointer-events: none; }
+.lv-leaving.to-left { animation: lv-out-left .2s ease-in-out forwards; }
+.lv-leaving.to-right { animation: lv-out-right .2s ease-in-out forwards; }
+.lv-page.from-right { animation: lv-in-right .2s ease-in-out; }
+.lv-page.from-left { animation: lv-in-left .2s ease-in-out; }
+@keyframes lv-out-left { to { transform: translateX(-100%); opacity: 0; } }
+@keyframes lv-out-right { to { transform: translateX(100%); opacity: 0; } }
+@keyframes lv-in-right { from { transform: translateX(100%); opacity: 0; } }
+@keyframes lv-in-left { from { transform: translateX(-100%); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .lv-leaving { display: none; } .lv-page.from-right, .lv-page.from-left { animation: none; } }
+
+.lv-device-btn { display: flex; align-items: center; gap: 6px; min-width: 0; padding: 0; border: 0; background: none; font: inherit; color: var(--t2); cursor: pointer; }
+.lv-device-btn svg { flex: none; }
+.lv-plus { flex: none; padding: 0 5px; border-radius: 99px; background: rgba(0,0,0,.1); font-size: 10px; font-weight: 600; line-height: 14px; }
+
+.lv-outputs { padding-bottom: 12px; }
+.lv-back { display: flex; align-items: center; gap: 6px; width: 100%; padding: 14px 16px 4px; border: 0; background: none; font: inherit; color: var(--t1); text-align: left; cursor: pointer; }
+.lv-back-title { font-size: 14px; font-weight: 600; }
+.lv-busy { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: var(--t2); }
+.lv-spin { animation: lv-spin .8s steps(8) infinite; }
+@keyframes lv-spin { to { transform: rotate(360deg); } }
+.lv-note { margin: 0; padding: 0 16px 10px; font-size: 11px; line-height: 1.35; color: var(--t2); }
+.lv-note-end { padding: 6px 16px 0; }
+.lv-label-tight { padding-top: 0; }
+.lv-out { display: flex; align-items: center; gap: 10px; width: 100%; padding: 6px 16px; border: 0; background: none; font: inherit; color: var(--t1); text-align: left; cursor: pointer; }
+.lv-out:disabled { cursor: default; }
+.lv-check { flex: none; color: var(--t3); }
+.lv-out[aria-checked="true"] .lv-check { color: var(--acc); }
+.lv-out-icon { flex: none; width: 16px; display: grid; place-items: center; color: var(--t2); }
+.lv-out-name { flex: 1; min-width: 0; font-size: 12.5px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lv-tag { flex: none; padding: 1px 6px; border-radius: 99px; background: rgba(0,0,0,.08); font-size: 10px; font-weight: 500; color: var(--t2); }
+
+.lv-delay { display: grid; gap: 8px; margin: 0 16px 8px; padding: 10px; border-radius: 10px; background: rgba(0,0,0,.05); }
+.lv-delay-head { display: flex; justify-content: space-between; align-items: baseline; font-size: 12px; font-weight: 500; }
+.lv-delay-head b { font-size: 11px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.lv-delay-row { display: grid; gap: 3px; }
+.lv-delay-top { display: flex; gap: 6px; font-size: 11px; }
+.lv-delay-name { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lv-delay-tag { margin-left: auto; flex: none; font-size: 10.5px; font-variant-numeric: tabular-nums; color: var(--t2); }
+.lv-track { display: flex; gap: 1px; height: 5px; overflow: hidden; }
+.lv-own { flex: none; border-radius: 2px; background: var(--acc); transition: width .25s ease-in-out; }
+.lv-held { flex: 1; min-width: 0; border-radius: 2px; background: rgba(0,122,255,.25); }
+
+.lv-offset { display: grid; gap: 6px; padding: 6px 16px; }
+.lv-offset-top { display: flex; align-items: center; gap: 6px; }
+.lv-offset-top .lv-out-icon { width: 14px; }
+.lv-step { flex: none; width: 18px; height: 18px; padding: 0; border: 0; border-radius: 50%; display: grid; place-items: center; background: rgba(0,0,0,.08); color: var(--t1); cursor: pointer; }
+.lv-step:active { background: rgba(0,0,0,.14); }
+.lv-ms { flex: none; min-width: 54px; text-align: center; font-size: 11px; font-weight: 500; font-variant-numeric: tabular-nums; color: var(--t2); }
+
+/* Still crop of the Sync section in the features grid. */
+.card .sync-art {
+  min-height: 0; padding: 36px 28px;
+  background:
+    radial-gradient(60% 60% at 20% 20%, #c9d7ff 0%, transparent 70%),
+    radial-gradient(60% 60% at 90% 90%, #ffd3e6 0%, transparent 70%), #eceef5;
+}
+.lv-mini {
+  width: 100%; max-width: 330px; padding-bottom: 8px; border-radius: 13px;
+  background: rgba(246,246,248,.72); -webkit-backdrop-filter: blur(30px) saturate(1.9); backdrop-filter: blur(30px) saturate(1.9);
+  box-shadow: 0 0 0 .5px rgba(0,0,0,.14), inset 0 0 0 .5px rgba(255,255,255,.6), 0 14px 44px rgba(0,0,0,.16), 0 2px 6px rgba(0,0,0,.06);
+}
+.card-link { font-size: 14.5px; font-weight: 500; text-decoration: underline; text-decoration-color: #c4c4c4; text-underline-offset: 3px; }
+.card-link:hover { text-decoration-color: var(--ink); }
 
 /* Articles: guides, comparisons, changelog */
 .article { max-width: 100%; }

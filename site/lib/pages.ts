@@ -37,6 +37,15 @@ export const pages: PageInfo[] = [
     updated: "2026-11-14",
   },
   {
+    href: "/guides/sync-audio-outputs-mac",
+    title: "How to play audio on multiple outputs in sync on a Mac",
+    short: "Multiple outputs in sync",
+    description: "Play a Mac’s sound on speakers, a TV and headphones at once without an echo. How Levels lines up outputs with different delays, and its limits.",
+    kind: "guide",
+    published: "2026-11-14",
+    updated: "2026-11-14",
+  },
+  {
     href: "/compare/soundsource",
     title: "Levels vs SoundSource: per-app volume on Mac compared",
     short: "Levels vs SoundSource",

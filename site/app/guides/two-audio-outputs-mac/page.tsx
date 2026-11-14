@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { ArticleShell, Note, Steps } from "@/components/ArticleShell";
 import { page } from "@/lib/pages";
-import { site } from "@/lib/site";
 
 const info = page("/guides/two-audio-outputs-mac");
 
@@ -37,8 +37,15 @@ export default function Page() {
       <h3>Bluetooth plays late</h3>
       <p>
         Bluetooth headphones and speakers usually play somewhere between 100 and 300 milliseconds behind wired outputs,
-        and macOS does not line them up. If you can hear both at once, it sounds like an echo. When two people listen in
-        different places, the delay is rarely a problem.
+        and macOS does not line them up. Drift Correction keeps the clocks together but leaves this delay in place. If
+        you can hear both at once, it sounds like an echo. When two people listen in different places, the delay is
+        rarely a problem.
+      </p>
+      <h3>A TV can be late too</h3>
+      <p>
+        A TV connected over HDMI processes sound before it plays it, and macOS often doesn’t know how long that takes.
+        In our test a TV played about 100 ms later than macOS reported, which is enough for a clear echo next to the
+        Mac’s speakers.
       </p>
       <h3>AirPlay plays later still</h3>
       <p>
@@ -58,9 +65,9 @@ export default function Page() {
       </p>
 
       <Note>
-        Levels cannot send sound to two outputs yet. We are building it: pick the outputs from the menu bar, set a volume
-        for each, and let Levels delay the faster device so wired speakers and Bluetooth headphones play together. New
-        versions appear on <a href={site.releases}>GitHub Releases</a>.
+        To hear several outputs in one room without an echo, the faster devices have to wait for the slowest one. Levels
+        1.4 does that from the menu bar, without a Multi-Output Device. See{" "}
+        <Link href="/guides/sync-audio-outputs-mac">how to play audio on multiple outputs in sync</Link>.
       </Note>
     </ArticleShell>
   );

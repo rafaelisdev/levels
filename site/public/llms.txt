@@ -10,9 +10,10 @@ Key facts:
 - Permission: macOS asks once for "System Audio Recording Only". Audio is processed locally in real time and is never recorded, stored or uploaded.
 - If Levels quits or crashes, every app immediately returns to its normal volume.
 - Levels remembers each app's volume and applies it again whenever that app plays.
+- Several outputs in sync (Levels 1.4 and later, macOS 14.2+): every app can play on several output devices at once, for example the built-in speakers, a TV over HDMI and headphones. Levels holds the faster outputs back to match the slowest, so they sound together without an echo. Each device except the built-in one has an offset slider (-200 to +500 ms, 1 ms steps) for tuning by ear. AirPlay is not included. Because all sound waits for the slowest output (around 170 ms with a TV), video on the Mac's screen runs ahead of the sound.
 - Price: free. License: MIT. Source code: https://github.com/rafaelisdev/levels
 - Current version: 1.3. Formerly named VolumeMixer.
-- Not yet supported: sending sound to two outputs at once (in development), per-app EQ or effects.
+- Not supported: per-app EQ or effects, sending one app to a different output than the others.
 
 ## Install
 
@@ -25,7 +26,8 @@ Key facts:
 - [Website](https://getlevels.app/): overview, interactive panel preview, install steps, FAQ
 - [How to change the volume of individual apps on a Mac](https://getlevels.app/guides/per-app-volume-mac)
 - [How to mute a single app on a Mac](https://getlevels.app/guides/mute-one-app-mac)
-- [How to play sound through two outputs at once on a Mac](https://getlevels.app/guides/two-audio-outputs-mac)
+- [How to play sound through two outputs at once on a Mac](https://getlevels.app/guides/two-audio-outputs-mac): the built-in Multi-Output Device
+- [How to play audio on multiple outputs in sync on a Mac](https://getlevels.app/guides/sync-audio-outputs-mac): how Levels lines up outputs with different delays
 - [Levels vs SoundSource](https://getlevels.app/compare/soundsource)
 - [Levels vs Background Music](https://getlevels.app/compare/background-music)
 - [Full description for LLMs](https://getlevels.app/llms-full.txt): how Levels works internally

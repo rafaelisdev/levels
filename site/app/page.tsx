@@ -2,13 +2,19 @@ import Image from "next/image";
 import Link from "next/link";
 import { InstallCommand } from "@/components/InstallCommand";
 import { LevelsMark } from "@/components/LevelsMark";
-import { PanelDemo } from "@/components/PanelDemo";
+import { PanelDemo, SyncPreview } from "@/components/PanelDemo";
 import { Arrow, SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { pages } from "@/lib/pages";
-import { faq, site } from "@/lib/site";
+import { faq, features, site } from "@/lib/site";
 import hero from "@/public/renders/hero.png";
 import macro from "@/public/renders/macro.png";
 import top from "@/public/renders/top.png";
+
+/** What the hero badge says about the current version. */
+const news: Record<string, string> = {
+  "1.3": `now in ${site.languages.length} languages`,
+  "1.4": "plays on several outputs in sync",
+};
 
 const icon = { width: 18, height: 18, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 1.6, strokeLinecap: "round", strokeLinejoin: "round", "aria-hidden": true } as const;
 
@@ -28,6 +34,7 @@ const jsonLd = {
       downloadUrl: site.zip,
       installUrl: site.github,
       fileSize: "0.8 MB",
+      featureList: features,
       license: "https://opensource.org/licenses/MIT",
       isAccessibleForFree: true,
       offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
@@ -49,7 +56,7 @@ export default function Home() {
       <main className="frame" id="top">
         <section className="section hero">
           <div>
-            <div className="pill"><span className="dot" /><b>v{site.version}</b> now in {site.languages.length} languages</div>
+            <div className="pill"><span className="dot" /><b>v{site.version}</b> {news[site.version]}</div>
             <h1>A volume slider for every app.</h1>
             <p className="lead">
               Levels is a free menu bar app for macOS that gives each app its own volume. Turn a call down
@@ -75,11 +82,11 @@ export default function Home() {
             <div>
               <p className="eyebrow">How it works</p>
               <h2>One click away, in the menu bar.</h2>
-              <p className="lead">Every app that plays sound gets its own fader. This is the real panel rebuilt for the web, so you can drag the sliders and click an icon to mute.</p>
+              <p className="lead">Every app that plays sound gets its own fader. This is the real panel rebuilt for the web: drag the sliders, click an icon to mute, or click the device name to pick outputs.</p>
               <ul className="checks">
                 <li><span>Turn a noisy browser down without touching your music.</span></li>
                 <li><span>Click an app’s icon to mute it, and click again to bring it back.</span></li>
-                <li><span>The output device and its volume sit at the top of the panel.</span></li>
+                <li><span>Click the device name to play on several outputs at once, lined up so they sound together.</span></li>
                 <li><span>Each app gets its volume back the next time it plays.</span></li>
               </ul>
             </div>
@@ -103,6 +110,16 @@ export default function Home() {
               <div className="card-icon"><svg {...icon}><rect x="6" y="6" width="12" height="12" rx="2" /><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4" /></svg></div>
               <h3>Nothing to install in the system</h3>
               <p>Levels uses the process taps Apple added to Core Audio in macOS 14.2. There are no drivers or kernel extensions.</p>
+            </article>
+            <article className="card wide full">
+              <div className="card-text">
+                <h3>Several outputs, in sync</h3>
+                <p>Play on the Mac’s speakers, a TV and headphones at once. Levels holds the faster outputs back until the slowest catches up, so you hear one sound and no echo. Any device can be nudged by ear.</p>
+                <Link className="card-link" href="/guides/sync-audio-outputs-mac">How the sync works</Link>
+              </div>
+              <div className="card-art sync-art">
+                <SyncPreview />
+              </div>
             </article>
             <article className="card">
               <div className="card-icon"><svg {...icon}><path d="M6 3h12v18l-6-4-6 4z" /></svg></div>

@@ -18,7 +18,8 @@ const rows: [string, string, string][] = [
   ["macOS", "11 or later, per-app volume on 14.2 or later", "15 Sequoia or later"],
   ["Per-app volume and mute", "Yes", "Yes"],
   ["Per-app EQ and effects", "No", "Yes"],
-  ["Send an app to another output", "Not yet", "Yes, including AirPlay"],
+  ["Play on several outputs at once", "Yes, from 1.4, with each device’s delay lined up (AirPlay not included)", "Yes, with output groups"],
+  ["Send an app to its own output", "No", "Yes, including AirPlay"],
   ["Output device controls", "Volume and mute", "Volume, balance, sample rate, maximum volume, device groups"],
   ["How it gets the audio", "macOS process taps, nothing else installed", "Rogue Amoeba’s ARK audio component, installed during setup"],
 ];
@@ -51,6 +52,11 @@ export default function Page() {
         If you mainly want to turn one app down and another up, Levels does that for free, installs nothing besides the
         app, and its code is open. It also covers older systems: per-app volume works from macOS 14.2, while SoundSource 6
         requires macOS 15.
+      </p>
+      <p>
+        Since version 1.4, Levels can also play everything on several outputs at once, such as the Mac’s speakers and a
+        TV, and it delays the faster devices so they don’t echo. How that works is in{" "}
+        <Link href="/guides/sync-audio-outputs-mac">playing audio on multiple outputs in sync</Link>.
       </p>
       <Note>
         Avoid running both at the same time. Each one takes over the sound of the apps you adjust, and two tools doing

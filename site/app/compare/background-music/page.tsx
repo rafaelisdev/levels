@@ -19,6 +19,7 @@ const rows: [string, string, string][] = [
   ["Per-app volume", "Yes", "Yes"],
   ["Stereo balance per app", "No", "Yes"],
   ["Pauses music when another app plays", "No", "Yes"],
+  ["Play on several outputs at once", "Yes, from 1.4, with delays lined up", "No, one output device"],
   ["Installs an audio driver", "No", "Yes, a virtual audio device"],
   ["System output while running", "Stays on your device", "Switches to the Background Music device"],
 ];
@@ -59,7 +60,9 @@ export default function Page() {
       </p>
       <p>
         On macOS 14.2 or later, Levels gives you per-app volume and mute without an audio driver and without changing your
-        output device. Removing it is just deleting the app.
+        output device. Since version 1.4 it can also{" "}
+        <Link href="/guides/sync-audio-outputs-mac">play on several outputs in sync</Link>, for example the Mac’s speakers
+        and a TV. Removing it is just deleting the app.
       </p>
       <Note>Run one of them at a time. Both change the sound of the same apps, and running them together can make it cut out or double.</Note>
 

@@ -12,7 +12,17 @@ export const metadata: Metadata = {
   openGraph: { type: "article", url: info.href, title: info.title, description: info.description },
 };
 
-const releases: { version: string; date: string; label: string; notes: string[] }[] = [
+const all: { version: string; date: string; label: string; notes: string[] }[] = [
+  {
+    // Shown once site.version is "1.4". Fill in the date and label on release day.
+    version: "1.4", date: "", label: "",
+    notes: [
+      "Play on several outputs at once. Click the device name in the panel, tick the outputs, and every app plays on all of them, lined up so they sound together.",
+      "A Sync section shows each output’s delay and how long Levels holds it back. Every device except the built-in one has a slider to fine-tune it by ear, and the setting is saved per device.",
+      "The panel stays responsive while outputs change, with a “Lining up…” indicator while Levels rebuilds them.",
+      "The new screens are translated into all 8 languages.",
+    ],
+  },
   {
     version: "1.3", date: "2026-11-13", label: "November 13, 2026",
     notes: [
@@ -44,6 +54,8 @@ const releases: { version: string; date: string; label: string; notes: string[] 
   },
 ];
 
+const releases = all.filter((r) => Number(r.version) <= Number(site.version));
+
 export default function Page() {
   return (
     <ArticleShell
@@ -53,7 +65,7 @@ export default function Page() {
       {releases.map((r) => (
         <section key={r.version} className="release">
           <h2 id={`v${r.version}`}>Levels {r.version}</h2>
-          <p className="article-meta"><time dateTime={r.date}>{r.label}</time></p>
+          {r.date && <p className="article-meta"><time dateTime={r.date}>{r.label}</time></p>}
           <ul>{r.notes.map((n) => <li key={n}>{n}</li>)}</ul>
         </section>
       ))}

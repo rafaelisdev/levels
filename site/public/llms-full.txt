@@ -6,7 +6,7 @@
 
 Levels adds an icon (three faders) to the macOS menu bar. Clicking it opens a small panel with:
 
-- the current output device (for example "MacBook Pro Speakers") and its volume slider with a mute button;
+- the current output device (for example "MacBook Pro Speakers") and its volume slider with a mute button. Clicking the device name opens the Outputs page in the same panel (Levels 1.4 and later);
 - a list of apps that are playing sound right now, each with its own volume slider (0 to 100%) and a mute toggle (click the app's icon);
 - a collapsible list of other apps that have opened audio but are silent at the moment;
 - a "Launch at login" switch (macOS 13+), "Reset" (all apps back to full volume) and "Quit".
@@ -23,6 +23,37 @@ The interface is in English and is localized into Spanish, German, French, Portu
 - Helper processes, such as a browser's audio or web content processes, are grouped under the app responsible for them.
 - If Levels stops reading the tap (it quits or crashes), macOS unmutes the app by itself, so a failure never leaves an app silent.
 - Once an app has been adjusted, its tap stays active even at 100% until the app quits. This avoids a volume jump at the 99% to 100% boundary.
+
+## Several outputs in sync (Levels 1.4 and later)
+
+The Outputs page lists every output device with a checkbox under "Play on". The macOS default output always plays and is marked "Default". With two or more outputs ticked, every app that plays sound comes out of all of them at once, lined up so they sound together.
+
+How it works:
+
+- Each app's sound is captured with a Core Audio process tap into a buffer with timestamps. Every output plays it through its own player, running on that output's own clock.
+- The shared delay equals the path of the slowest output. Levels holds every other output back by the difference, so all of them play each sound at the same moment.
+- Every player reads the buffer by the Mac's absolute host time. Clock drift between devices (tens of parts per million, about 1 to 2 ms per 10 minutes) is absorbed by resampling instead of building up.
+- Each device's latency comes from macOS, the same figure audio workstations such as Ableton Live show. What macOS does not know, such as a TV's sound processing over HDMI, is added with a per-device offset set by ear (-200 to +500 ms, 1 ms steps). Offsets are saved per device.
+- The "Sync" section shows the shared delay and, for each output, its own delay (solid bar) and how long Levels holds it back (light bar), labelled "slowest" or "waits N ms". A "Lining up…" indicator shows while outputs are rebuilt; the panel stays responsive.
+- A Multi-Output Device in Audio MIDI Setup keeps device clocks in step but does not line up their delays.
+
+Measured results:
+
+- Recorded with a microphone after setting the TV's offset, a TV and the MacBook speakers arrived with a spread of 0.00 ms, click to click, at 0.1 ms resolution.
+- A Philips TV over HDMI played about 100 ms later than macOS reported (macOS listed about 2 ms).
+- By ear, MacBook speakers, a TV and headphones playing at once sounded in sync.
+
+Limits:
+
+- Needs macOS 14.2 or later.
+- All sound waits for the slowest output, around 170 ms with a TV. Video on the Mac's screen runs ahead of the sound; on the TV's screen it is closer because the TV delays the picture too.
+- AirPlay outputs are not part of synced playback (about 2 s of delay).
+- A TV over HDMI is tuned by ear once; after reconnecting HDMI it may need a small correction.
+- Bluetooth headphones use the latency they report to macOS, or are tuned by ear.
+- An app that starts playing while several outputs are on plays only on the default output for about the first second.
+- Every app plays on all ticked outputs; routing one app to its own output is not supported.
+
+Guide: https://getlevels.app/guides/sync-audio-outputs-mac
 
 ## Requirements and permissions
 
