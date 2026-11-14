@@ -28,7 +28,7 @@ const jsonLd = {
       url: site.url,
       image: `${site.url}/opengraph-image`,
       applicationCategory: "UtilitiesApplication",
-      operatingSystem: "macOS 11 or later (per-app volume: macOS 14.2 or later)",
+      operatingSystem: "macOS 14.2 or later (on macOS 11 to 14.1 it controls the output device volume only)",
       softwareVersion: site.version,
       inLanguage: ["en", "es", "de", "fr", "pt", "ru", "ja", "zh-Hans", "ko"],
       downloadUrl: site.zip,
@@ -68,7 +68,7 @@ export default function Home() {
               <a className="btn" href={site.zip}>Download .zip</a>
             </div>
             <div className="specs">
-              <span>Free and open source</span><span>0.8 MB download</span><span>Apple Silicon &amp; Intel</span><span>macOS 11+</span><span>{site.languages.length} languages</span>
+              <span>Free and open source</span><span>0.8 MB download</span><span>Apple Silicon &amp; Intel</span><span>macOS 14.2+</span><span>{site.languages.length} languages</span>
             </div>
           </div>
           <div className="hero-art">
