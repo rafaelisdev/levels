@@ -3,7 +3,7 @@
 Маленькое приложение для строки меню macOS: громкость каждого приложения отдельно,
 плюс общая громкость устройства вывода. Раньше называлось VolumeMixer («Микшер»).
 
-Сайт: **https://getlevels.vercel.app** (код в [site/](site/), Next.js на Vercel).
+Сайт: **https://getlevels.app** (код в [site/](site/), Next.js на Vercel). Лицензия: [MIT](LICENSE).
 
 ```bash
 brew install rafaelisdev/tap/levels
@@ -105,3 +105,12 @@ vercel deploy --prod                       # публикация
 
 Там же `public/llms.txt` и `public/llms-full.txt` для LLM, `robots`, `sitemap`,
 OpenGraph-картинка и JSON-LD (SoftwareApplication + FAQPage).
+
+Страницы сайта: главная, гайды (`/guides/...`), сравнения (`/compare/...`) и
+`/changelog`. Список страниц один на всё (хаб, футер, sitemap): `site/lib/pages.ts`.
+Тексты пишем без длинных тире и без AI-штампов. Превью-сборки Vercel помечаются
+`noindex`, а `www.getlevels.app` перенаправляет на `getlevels.app`.
+
+## Лицензия
+
+[MIT](LICENSE).

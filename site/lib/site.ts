@@ -1,11 +1,11 @@
 export const site = {
   name: "Levels",
-  url: "https://getlevels.vercel.app",
+  url: "https://getlevels.app",
   version: "1.3",
   languages: ["English", "Español", "Deutsch", "Français", "Português", "Русский", "日本語", "简体中文", "한국어"],
-  title: "Levels — a volume slider for every Mac app",
+  title: "Levels: per-app volume control for Mac",
   description:
-    "Levels is a tiny macOS menu bar app that gives every app its own volume slider and mute. No drivers, no kernel extensions. Install with Homebrew.",
+    "Levels is a free, open source menu bar app that gives every Mac app its own volume slider and mute button. It installs no drivers. Get it with Homebrew.",
   github: "https://github.com/rafaelisdev/levels",
   releases: "https://github.com/rafaelisdev/levels/releases/latest",
   zip: "https://github.com/rafaelisdev/levels/releases/latest/download/Levels.zip",
@@ -16,15 +16,15 @@ export const site = {
 export const faq = [
   {
     q: "Does Levels install a driver or kernel extension?",
-    a: "No. Levels uses Core Audio process taps, an API Apple added in macOS 14.2. Nothing is installed into the system, so there is nothing to clean up when you remove the app.",
+    a: "No. Levels uses Core Audio process taps, which Apple added in macOS 14.2. Nothing is installed into the system, so removing the app leaves nothing behind.",
   },
   {
     q: "Which macOS versions are supported?",
-    a: "Per-app volume needs macOS 14.2 or later. Levels itself runs on macOS 11 Big Sur and later, on Apple Silicon and Intel; on older systems it controls the output device volume.",
+    a: "Per-app volume needs macOS 14.2 or later. Levels itself runs on macOS 11 Big Sur and later, on Apple Silicon and Intel. On older systems it controls the output device volume only.",
   },
   {
     q: "Why does macOS ask for “System Audio Recording Only” access?",
-    a: "That permission is what lets an app take over another app’s sound to change its volume. Levels processes audio in real time on your Mac; it never records, stores or uploads anything.",
+    a: "macOS requires that permission before one app can change the sound of another. Levels processes audio in real time on your Mac and never records, stores or uploads it.",
   },
   {
     q: "What happens if Levels quits or crashes?",
@@ -36,6 +36,6 @@ export const faq = [
   },
   {
     q: "Is Levels free?",
-    a: "Yes. Levels is free, and its source code is on GitHub.",
+    a: "Yes. Levels is free and open source under the MIT license, and the code is on GitHub.",
   },
 ] as const;
