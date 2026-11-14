@@ -9,6 +9,7 @@ private extension Color {
 
 struct MixerPanel: View {
     @ObservedObject var model: MixerModel
+    @ObservedObject var updater: Updater = .shared
     var close: () -> Void = {}
     @State private var showOthers = false
     @State private var showingOutputs = false
@@ -45,6 +46,12 @@ struct MixerPanel: View {
 
             if model.menuBarIconHidden {
                 HiddenIconNotice { model.menuBarIconHidden = false }
+                    .padding(.horizontal, 12)
+                    .padding(.bottom, 10)
+            }
+
+            if updater.state != .idle {
+                UpdateBanner(updater: updater)
                     .padding(.horizontal, 12)
                     .padding(.bottom, 10)
             }
@@ -513,6 +520,49 @@ struct HiddenIconNotice: View {
                     .foregroundColor(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
                 Button("Got it", action: dismiss)
+                    .buttonStyle(ProminentButtonStyle(color: .accentColor))
+            }
+        }
+        .padding(10)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(RoundedRectangle(cornerRadius: 10, style: .continuous).fill(Color.accentColor.opacity(0.10)))
+    }
+}
+
+/// A new version: one click installs it, or opens the download page when Levels can't
+/// replace itself where it is.
+struct UpdateBanner: View {
+    @ObservedObject var updater: Updater
+
+    var body: some View {
+        HStack(spacing: 10) {
+            Image(systemName: "arrow.down.circle.fill")
+                .font(.system(size: 16))
+                .foregroundColor(.accentColor)
+            switch updater.state {
+            case .idle:
+                EmptyView()
+            case .available(let update):
+                Text("Levels \(update.version) is available")
+                    .font(.system(size: 12, weight: .semibold))
+                Spacer(minLength: 4)
+                Button("Update") { updater.install() }
+                    .buttonStyle(ProminentButtonStyle(color: .accentColor))
+            case .installing:
+                Text("Updating…")
+                    .font(.system(size: 12, weight: .semibold))
+                Spacer(minLength: 4)
+                ProgressView()
+                    .progressViewStyle(CircularProgressViewStyle())
+                    .scaleEffect(0.5)
+                    .frame(width: 16, height: 16)
+            case .failed:
+                Text("Couldn’t install the update. Download it instead.")
+                    .font(.system(size: 11))
+                    .foregroundColor(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                Spacer(minLength: 4)
+                Button("Download") { NSWorkspace.shared.open(Updater.releasesPage) }
                     .buttonStyle(ProminentButtonStyle(color: .accentColor))
             }
         }

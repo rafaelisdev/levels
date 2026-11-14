@@ -40,6 +40,11 @@
 "waits %lld ms" = "espera %lld ms";
 "macOS hid the Levels icon" = "O macOS ocultou o ícone do Levels";
 "The menu bar is full, so the icon sits behind the camera notch. Hold ⌘ and drag icons to make room, or open Levels again from Spotlight to bring up this panel." = "A barra de menus está cheia, então o ícone ficou atrás do entalhe da câmera. Segure ⌘ e arraste ícones para abrir espaço, ou abra o Levels de novo pelo Spotlight para mostrar este painel.";
+"Levels %@ is available" = "Levels %@ está disponível";
+"Update" = "Atualizar";
+"Updating…" = "Atualizando…";
+"Couldn’t install the update. Download it instead." = "Não foi possível instalar a atualização. Baixe-a manualmente.";
+"Download" = "Baixar";
 "Got it" = "Entendi";
 "capture the app’s audio" = "capturar o áudio do app";
 "read the audio format" = "ler o formato de áudio";

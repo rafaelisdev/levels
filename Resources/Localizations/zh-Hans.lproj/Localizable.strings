@@ -40,6 +40,11 @@
 "waits %lld ms" = "等待 %lld 毫秒";
 "macOS hid the Levels icon" = "macOS 隐藏了 Levels 图标";
 "The menu bar is full, so the icon sits behind the camera notch. Hold ⌘ and drag icons to make room, or open Levels again from Spotlight to bring up this panel." = "菜单栏已满，图标被摄像头刘海挡住了。按住 ⌘ 拖动图标腾出空间，或从聚焦搜索再次打开 Levels 以显示此面板。";
+"Levels %@ is available" = "Levels %@ 已可用";
+"Update" = "更新";
+"Updating…" = "正在更新…";
+"Couldn’t install the update. Download it instead." = "无法安装更新，请手动下载。";
+"Download" = "下载";
 "Got it" = "知道了";
 "capture the app’s audio" = "捕获应用音频";
 "read the audio format" = "读取音频格式";

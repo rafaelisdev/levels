@@ -40,6 +40,11 @@
 "waits %lld ms" = "ждёт %lld мс";
 "macOS hid the Levels icon" = "macOS спрятала значок Levels";
 "The menu bar is full, so the icon sits behind the camera notch. Hold ⌘ and drag icons to make room, or open Levels again from Spotlight to bring up this panel." = "Строка меню заполнена, поэтому значок оказался за вырезом камеры. Перетащите значки с зажатой ⌘, чтобы освободить место, или снова откройте Levels через Spotlight — появится эта панель.";
+"Levels %@ is available" = "Доступна Levels %@";
+"Update" = "Обновить";
+"Updating…" = "Обновляется…";
+"Couldn’t install the update. Download it instead." = "Не удалось установить обновление. Скачайте его вручную.";
+"Download" = "Скачать";
 "Got it" = "Понятно";
 "capture the app’s audio" = "перехватить звук приложения";
 "read the audio format" = "прочитать формат звука";

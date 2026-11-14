@@ -10,6 +10,10 @@ cask "levels" do
   desc "Per-app volume control in the menu bar"
   homepage "https://github.com/__OWNER__/levels"
 
+  # Levels updates itself since 1.4.1 (signed update.json in every release). Add
+  # `auto_updates true` here from the next release on: until then `brew upgrade` must
+  # still reach installs of 1.4, which can't update themselves.
+
   depends_on macos: :big_sur
 
   app "Levels.app"

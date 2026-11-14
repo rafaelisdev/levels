@@ -11,6 +11,8 @@ enum DebugFlags {
     static let openAtLaunch = args.contains("--open") || snapshotPath != nil
     /// `--snapshot <path>`: keep writing the panel to a PNG (for checking the UI).
     static let snapshotPath: String? = value(after: "--snapshot")
+    /// `--update-feed <url>`: read update.json from here instead of the latest release.
+    static let updateFeed: URL? = value(after: "--update-feed").flatMap(URL.init(string:))
     /// `--sync <bundle id> [--sync-outputs uid,uid]`: multi-output sync test (SyncProbe).
     static let syncApp: String? = value(after: "--sync")
     static let syncOutputs: [String]? = value(after: "--sync-outputs")?.split(separator: ",").map(String.init)
@@ -66,6 +68,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { self.togglePanel() }
         }
         watchForHiddenStatusItem(model: model)
+        Updater.shared.canInstallUnattended = { [weak self] in
+            !(self?.panel.isVisible ?? true) && !model.apps.contains(where: \.isPlaying)
+        }
+        Updater.shared.start()
         if let app = DebugFlags.syncApp, #available(macOS 14.2, *) {
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                 SyncProbe.start(appID: app, outputUIDs: DebugFlags.syncOutputs)
