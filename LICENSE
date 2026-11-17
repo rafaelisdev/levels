@@ -1,0 +1,23 @@
+Levels License
+
+Copyright (c) 2026 rafaelisdev. All rights reserved.
+
+Levels is freeware: you may download and use it at no cost, for personal or commercial
+purposes, on any number of Macs.
+
+You may not:
+  - sell, rent or sublicense Levels;
+  - redistribute it, alone or bundled with other software, other than by pointing to
+    the official downloads (getlevels.app, github.com/rafaelisdev/levels and the
+    rafaelisdev/tap Homebrew tap);
+  - modify it, or decompile, disassemble or otherwise reverse engineer it, except as
+    far as applicable law allows this despite this limitation;
+  - remove or change its copyright or license notices.
+
+The source code of Levels is not published and is not licensed under these terms.
+
+LEVELS IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
+BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY CLAIM, DAMAGES OR
+OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT
+OF OR IN CONNECTION WITH LEVELS OR THE USE OR OTHER DEALINGS IN IT.
