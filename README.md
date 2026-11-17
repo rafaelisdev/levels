@@ -11,10 +11,10 @@ brew install rafaelisdev/tap/levels
 ```
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/rafaelisdev/levels/main/install.sh | bash
+curl -fsSL https://getlevels.app/install.sh | bash
 ```
 
-Or download `Levels.zip` from the [latest release](https://github.com/rafaelisdev/levels/releases/latest).
+Or download [Levels.zip](https://getlevels.app/download).
 
 - macOS 11 Big Sur or later, Apple Silicon and Intel.
 - Per-app volume needs macOS 14.2 or later (Core Audio process taps). On older systems

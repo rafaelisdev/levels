@@ -1,6 +1,6 @@
 #!/bin/bash
-# Installs Levels from the latest GitHub release:
-#   curl -fsSL https://raw.githubusercontent.com/rafaelisdev/levels/main/install.sh | bash
+# Installs the latest release of Levels:
+#   curl -fsSL https://getlevels.app/install.sh | bash
 set -euo pipefail
 
 REPO="${LEVELS_REPO:-rafaelisdev/levels}"
